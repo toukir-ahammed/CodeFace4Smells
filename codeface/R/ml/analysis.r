@@ -226,6 +226,11 @@ check.corpus.precon <- function(corp.base) {
     ## Trim trailing and leading whitespace
     author <- str_trim(author)
 
+    ## Replace textual ' at  ' with @, sometimes
+    ## we can recover an email
+    author <- sub(' at ', '@', author)
+    author <- sub(' AT ', '@', author)
+
     ## Check if email exists
     email.exists <- grepl("<.+>", author, TRUE)
 
@@ -233,11 +238,6 @@ check.corpus.precon <- function(corp.base) {
       msg <- str_c("Incorrectly formatted author field (expected XXX XXX ",
                    "<xxxyyy@abc.tld>); attempting to recover from: ", author)
       logdevinfo(msg, logger="ml.analysis")
-
-      ## Replace textual ' at  ' with @, sometimes
-      ## we can recover an email
-      author <- sub(' at ', '@', author)
-      author <- sub(' AT ', '@', author)
 
       ## Check for @ symbol
       r <- regexpr("\\S+@\\S+", author, TRUE)
@@ -258,7 +258,7 @@ check.corpus.precon <- function(corp.base) {
         ## string minus the new email part as name, and construct
         ## a valid name/email combination
         name <- sub(email, "", author, fixed=TRUE)
-        name <- str_trim(name)
+        name <- fix.name(name)
       }
 
       ## Name and author are now given in both cases, construct
@@ -266,13 +266,15 @@ check.corpus.precon <- function(corp.base) {
       author <- paste(name, ' <', email, '>', sep="")
     }
     else {
-      ## Verify that the order is correct
+      ## There is a correct email address. Ensure that the order is correct
+      ## and fix cases like "<hans.huber@hubercorp.com> Hans Huber"
+
       ## Get email and name parts
       r <- regexpr("<.+>", author, TRUE)
       if(r[[1]] == 1) {
         email <- substr(author, r, r + attr(r,"match.length")-1)
         name <- sub(email, "", author, fixed=TRUE)
-        name <- str_trim(name)
+        name <- fix.name(name)
         email <- str_trim(email)
         author <- paste(name,email)
       }
