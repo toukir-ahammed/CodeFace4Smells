@@ -70,15 +70,15 @@ annotate.cluster <- function(g) {
   return(g)
 }
 
-prepare.clusters <- function(con, pid, range.id) {
+prepare.clusters <- function(con, pid, range.id, max.length=8) {
   l <- query.cluster.ids.con(con, pid, range.id, "Spin Glass Community")
   clusters.list <- gen.clusters.list(l, con)
 
   ## Sort the clusters by number of vertices
   sizes <- sapply(clusters.list, vcount)
-  clusters.list <- clusters.list[sort(sizes, index.return=TRUE, decreasing=TRUE)$ix]
+  clusters.list <- clusters.list[sort(sizes, index.return=TRUE,
+                                      decreasing=TRUE)$ix]
 
-  max.length <- 8
   if (length(clusters.list) < max.length) {
     max.length <- length(clusters.list)
   }
