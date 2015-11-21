@@ -21,8 +21,8 @@
 ## Then, use standard query functions and the associated processing
 ## mechanisms to work with the database content.
 
-source("config.r")
-source("query.r")
+source("../config.r", chdir=TRUE)
+source("../query.r", chdir=TRUE)
 
 create.conf <- function(codeface.conf, project.conf=NULL) {
   ## Load configuration file(s)
