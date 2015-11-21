@@ -69,3 +69,45 @@ annotate.cluster <- function(g) {
   ## page rank distribution and mean page rank.
   return(g)
 }
+
+prepare.clusters <- function(con, pid, range.id) {
+  l <- query.cluster.ids.con(con, pid, range.id, "Spin Glass Community")
+  clusters.list <- gen.clusters.list(l, con)
+
+  ## Sort the clusters by number of vertices
+  sizes <- sapply(clusters.list, vcount)
+  clusters.list <- clusters.list[sort(sizes, index.return=TRUE, decreasing=TRUE)$ix]
+
+  max.length <- 8
+  if (length(clusters.list) < max.length) {
+    max.length <- length(clusters.list)
+  }
+
+  return(clusters.list[1:max.length])
+}
+
+gen.clusters.list <- function(l, con) {
+  clusters.list <- lapply(1:length(l), function(i) {
+    g <- construct.cluster(con, l[[i]])
+
+    ## Self-loops in the proximity analysis can become very strong;
+    ## the resulting edges then typically destroy the visualisation
+    ## completely. Get rid of them, thus..
+    ## NOTE: simplify must be called before the cluster is annotated
+    ## because the function
+    if(!is.null(g)) {
+      g <- simplify(g, remove.loops=TRUE)
+    }
+
+    return(g)
+  })
+
+  ## Remove empty clusters
+  clusters.list[sapply(clusters.list, is.null)] <- NULL
+
+  clusters.list <- lapply(clusters.list, function(g) {
+    return(annotate.cluster(g))
+  })
+
+  return(clusters.list)
+}
