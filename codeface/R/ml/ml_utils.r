@@ -23,14 +23,6 @@ source.files <- function(path) {
   }
 }
 
-## Create a directory if it does not yet exist
-gen.dir <- function(dir) {
-  if (!file_test("-d", dir)) {
-    if (!dir.create(dir, recursive=TRUE)) {
-      stop("Cannot create directory ", dir)
-    }
-  }
-}
 
 
 ## Initially based on snatm code, albeit only the basic outline has

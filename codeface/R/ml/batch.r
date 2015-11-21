@@ -23,6 +23,7 @@ s <- suppressPackageStartupMessages
 source("../config.r", chdir=TRUE)
 source("../db.r", chdir=TRUE)
 source("../mc_helpers.r", chdir=TRUE)
+source("../utils.r", chdir=TRUE)
 source("ml_utils.r")
 s(source("analysis.r"))
 s(source("project.spec.r"))

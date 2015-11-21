@@ -100,3 +100,11 @@ select.graphics.dev <- function(filename, size, format="png") {
   return(dev)
 }
 
+## Create a directory if it does not yet exist
+gen.dir <- function(dir) {
+  if (!file_test("-d", dir)) {
+    if (!dir.create(dir, recursive=TRUE)) {
+      stop("Cannot create directory ", dir)
+    }
+  }
+}
