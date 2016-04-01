@@ -362,6 +362,39 @@ def generate_report(start_rev, end_rev, resdir):
 
     os.chdir(orig_wd)
     shutil.rmtree(tmpdir)
+    
+def generate_report_st(stdir):
+    log.info("  -> Generating report")
+    # We run latex in a temporary directory so that it's easy to
+    # get rid of the log files etc. created during the run that are
+    # not relevant for the final result
+    orig_wd = os.getcwd()
+    tmpdir = mkdtemp()
+    os.chdir(tmpdir)
+    
+    # Compile reports with lualatex
+    cmd = []
+    cmd.append("lualatex")
+    cmd.append("-interaction=nonstopmode")
+    cmd.append(os.path.join(stdir, "correlations.tex"))
+    execute_command(cmd, ignore_errors=True)
+    try:
+        shutil.copy("correlations.pdf", stdir)
+    except IOError:
+        log.warning("Could not copy report PDF (missing input data?)")
+        
+    cmd = []
+    cmd.append("lualatex")
+    cmd.append("-interaction=nonstopmode")
+    cmd.append(os.path.join(stdir, "report.tex"))
+    execute_command(cmd, ignore_errors=True)
+    try:
+        shutil.copy("report.pdf", stdir)
+    except IOError:
+        log.warning("Could not copy report PDF (missing input data?)")
+
+    os.chdir(orig_wd)
+    shutil.rmtree(tmpdir)
 
 def generate_reports(start_rev, end_rev, range_resdir):
     files = glob(os.path.join(range_resdir, "*.dot"))

@@ -23,7 +23,7 @@ from .configuration import Configuration, ConfigurationError
 from .cluster.cluster import doProjectAnalysis, LinkType
 from .ts import dispatch_ts_analysis
 from .util import (execute_command, generate_reports, layout_graph,
-                   check4ctags, check4cppstats, BatchJobPool, generate_analysis_windows)
+                   check4ctags, check4cppstats, BatchJobPool, generate_analysis_windows, generate_report_st)
 
 def loginfo(msg):
     ''' Pickleable function for multiprocessing '''
@@ -232,3 +232,25 @@ def mailinglist_analyse(resdir, mldir, codeface_conf, project_conf, loglevel,
         execute_command([exe] + logargs + cmd + [ml["name"]],
                 direct_io=True, cwd=cwd)
     log.info("=> Codeface mailing list analysis complete!")
+
+
+def sociotechnical_analyse(resdir, codeface_conf, project_conf, loglevel,
+                           logfile, n_jobs):
+    conf = Configuration.load(codeface_conf, project_conf)
+    project_resdir = pathjoin(resdir, conf["project"])
+
+    exe = abspath(resource_filename(__name__, "R/sociotechnical.r"))
+    cwd, _ = pathsplit(exe)
+    cmd = [exe]
+    if logfile:
+        cmd.extend(("--logfile", "{}.R.sociotechnical".format(logfile)))
+    cmd.extend(("--loglevel", loglevel))
+    cmd.extend(("-c", codeface_conf))
+    cmd.extend(("-p", project_conf))
+    cmd.extend(("-j", str(n_jobs)))
+    cmd.append(project_resdir)
+    
+    log.info("=> Performing socio-technical analysis")
+    execute_command(cmd, direct_io=True, cwd=cwd)
+    generate_report_st(pathjoin(resdir, conf["project"], "st"))
+    log.info("=> Codeface socio-technical analysis complete!")

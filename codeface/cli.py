@@ -29,7 +29,7 @@ from glob import glob
 from codeface.logger import set_log_level, start_logfile, log
 from codeface.configuration import Configuration
 from codeface.util import execute_command
-from codeface.project import project_analyse, mailinglist_analyse
+from codeface.project import project_analyse, mailinglist_analyse, sociotechnical_analyse
 
 def get_parser():
     parser = argparse.ArgumentParser(prog='codeface',
@@ -93,6 +93,15 @@ def get_parser():
                         help="Directory to store analysis results in")
     ml_parser.add_argument('mldir',
                         help="Directory for mailing lists")
+    
+    st_parser = sub_parser.add_parser('st', help='Run socio-technical analysis')
+    st_parser.set_defaults(func=cmd_st)
+    st_parser.add_argument('-c', '--config', help="Codeface configuration file",
+                default='codeface.conf')
+    st_parser.add_argument('-p', '--project', help="Project configuration file",
+                required=True)
+    st_parser.add_argument('resdir',
+                        help="Directory with communication and collaboration analysis results")
 
     dyn_parser = sub_parser.add_parser('dynamic', help='Start R server for a dynamic graph')
     dyn_parser.set_defaults(func=cmd_dynamic)
@@ -127,6 +136,18 @@ def cmd_ml(args):
         logfile = os.path.abspath(logfile)
     mailinglist_analyse(resdir, mldir, codeface_conf, project_conf,
                         args.loglevel, logfile, args.jobs, args.mailinglist)
+    return 0
+
+def cmd_st(args):
+    '''Dispatch the ``st`` command.'''
+    # First make all the args absolute
+    resdir = os.path.abspath(args.resdir)
+    codeface_conf, project_conf = map(os.path.abspath, (args.config, args.project))
+    logfile = args.logfile
+    if logfile:
+        logfile = os.path.abspath(logfile)
+    sociotechnical_analyse(resdir, codeface_conf, project_conf,
+                           args.loglevel, logfile, args.jobs)
     return 0
 
 def cmd_dynamic(args):
