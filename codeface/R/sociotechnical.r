@@ -80,31 +80,26 @@ load.mailinglist.graph <- function(conf, start.date, end.date) {
 load.global.graph <- function(mail.graph, code.graph) {
   ## use communication network as starting point
   global.graph <- mail.graph
+  
+  ## add code-only devs
+  for (dev.id in V(code.graph)$id){
+    if (!(dev.id %in% V(global.graph)$id)) {
+      global.graph <- add_vertices(global.graph, 1, name=V(code.graph)[V(code.graph)$id == dev.id]$name, 
+                                   id=dev.id)
+    }
+  }
+  
   ## retrieve collaboration edges and add them to the global graph
   code.df <- get.data.frame(code.graph)
   for (edge in 1:nrow(code.df)) {
     name1 <- code.df[edge, 1]
     name2 <- code.df[edge, 2]
     weight <- code.df[edge, 3]
-    ## if a dev is not already present, add it to the graph
-    if (!(name1 %in% V(global.graph)$name)) {
-      global.graph <- add_vertices(global.graph, 1, name=name1, 
-                                   id=V(code.graph)[V(code.graph)$name == name1]$id)
-    }
-    if (!(name2 %in% V(global.graph)$name)) {
-      global.graph <- add_vertices(global.graph, 1, name=name2, 
-                                   id=V(code.graph)[V(code.graph)$name == name2]$id)
-    }
     ## add weighted collaboration to the global graph
     global.graph <- add_edges(global.graph, c(V(global.graph)[V(global.graph)$name %in% name1], 
                                               V(global.graph)[V(global.graph)$name %in% name2]), weight=weight)
   }
-  ## Add disconnected code developers
-  disc.code.devs <- setdiff(V(code.graph)$id, V(global.graph)$id)
-  for (disc.dev in disc.code.devs) {
-    global.graph <- add_vertices(global.graph, 1, id=disc.dev,
-                                 name=V(code.graph)[V(code.graph)$id == disc.dev]$name)
-  }
+
   ## simplify the graph removing multiple edges and loops
   global.graph <- simplify(global.graph, remove.multiple=TRUE, remove.loops=TRUE,
                            edge.attr.comb="sum")
@@ -162,9 +157,16 @@ community.smell.missing.links <- function (mail.graph, code.graph, precomputed.s
       }
     }
   }
+  
+  ## if no precoumputed organizational silo we are done
+  if (length(precomputed.silo) == 0){
+    return(missing)
+  }
+  
   ## If organizational silo is not pre-computed, calculate it
-  if (is.na(precomputed.silo))
+  if (is.na(precomputed.silo)){
     precomputed.silo <- community.smell.organizational.silo(mail.graph, code.graph)
+  }
   ## Add the missing links due to developers abstence in the mailing lists
   for (edge in precomputed.silo) {
     missing[[length(missing) + 1]] <- edge
@@ -213,6 +215,12 @@ community.smell.primadonnas <- function (mail.graph, clusters, code.graph, colla
   comms <- communities(clusters)
   ## For every potential black-cloud, check the collaboration of the involved sub-communities.
   ## if it is greater than the threshold, we have two prima-donnas
+  
+  ## if no potential black cloud we are done
+  if (length(precomputed.black) == 0){
+    return(primadonnas)
+  }
+  
   if (is.na(precomputed.black)) {
     precomputed.black <- community.smell.potential.black.cloud(mail.graph, clusters)
   }
@@ -305,6 +313,11 @@ community.metric.sociotechnical.congruence <- function (mail.graph, code.graph) 
 ## Compute and return the mean value of decision communicability.
 ## communicability is computed as (1 - mean(in-communicability))
 community.metric.mean.communicability <- function (mail.graph, code.graph) {
+  ## If no collaborations, communicability is 1
+  if (length(E(code.graph)) == 0) {
+    return(1)
+  }
+  
   ## for each collaboration compute its in-communicability value
   collaborations <- get.edgelist(code.graph)
   mai <- c()
