@@ -312,6 +312,9 @@ community.metric.sociotechnical.congruence <- function (mail.graph, code.graph) 
   missing.collaborations <- length(community.smell.missing.links(mail.graph, code.graph))
   healthy.collaborations <- length(E(code.graph)) - missing.collaborations
   congruence <- healthy.collaborations / (length(E(code.graph)))
+  if (is.na(congruence)) {
+    congruence <- 1
+  }
   return(congruence)
 }
 
@@ -561,7 +564,8 @@ create.correlations.report.tex <- function(sociotechdir, pears.df.e, pears.df.p,
 }
 
 ## Generate latex report file about community smells
-create.community.smells.report.tex <- function(df, sociotechdir) {
+create.community.smells.report <- function(sociotechdir) {
+  df <- read.csv(file.path(sociotechdir, "report.csv"))
   file.name <- file.path(sociotechdir, "report.tex")
   ## set the decimal digits
   dig <- c(0,0,0,0,0,0,4,4,4,0,4,0,4,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0)
@@ -570,9 +574,9 @@ create.community.smells.report.tex <- function(df, sociotechdir) {
         "\\usepackage{graphicx}\n", "\\usepackage{calc}\n", "\\usepackage{lmodern}\n", "\\begin{document}\n",
         "\\setlength{\\parindent}{0pt}\n", "\\begin{center}\n"),
       file=file.name)
-  for (iter in 1:((ncol(df) / 24) + 1)) {
-    ini <- (iter - 1) * 24 + 1
-    fin <- min(ini + 23, ncol(df))
+  for (iter in 1:((ncol(df) / 23) + 1)) {
+    ini <- (iter - 1) * 23 + 1
+    fin <- min(ini + 22, ncol(df))
     tab <- xtable(df[ini:fin])
     digits(tab) <- c(0, dig[ini:fin])
     print(tab, type="latex", floating=FALSE, file=file.name, append=TRUE,
@@ -738,6 +742,9 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
     ## core code devs turnover
     left.code.core <- setdiff(prev.code.core, devs.code.core)
     all.metric.core.code.turnover[range] <- (length(left.code.core) / ((length(prev.code.core) + length(devs.code.core)) / 2))
+    if (is.na(all.metric.core.code.turnover[range])) {
+      all.metric.core.code.turnover[range] <- 0
+    }
     prev.code.core <- devs.code.core
     ## core mail devs turnover
     left.mail.core <- setdiff(prev.mail.core, devs.mail.core)
@@ -904,7 +911,7 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
   ## Global report generation
   report.data <-
     data.frame(
-      ranges, all.metric.range.days, all.devs, all.mail.only.devs, all.code.only.devs, all.mail.code.devs, 
+      ranges, floor(all.metric.range.days), all.devs, all.mail.only.devs, all.code.only.devs, all.mail.code.devs, 
       round(all.mail.only.devs / all.devs, digits=4), round(all.code.only.devs / all.devs, digits=4), 
       round(all.mail.code.devs / all.devs, digits=4),
       all.devs.code.sponsored, round(all.devs.code.sponsored / all.devs, digits=4),
@@ -934,8 +941,6 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
                              "closeness.centr", "betweenness.centr", "degree centr", 
                              "global.mod", "mail.mod", "code.mod", "density")
   write.csv(report.data, file=file.path(sociotechdir, "report.csv"), row.names=FALSE)
-  ## create tex file
-  create.community.smells.report.tex(report.data, sociotechdir)
 }
 
 ## compute Pearson's and Spearman's correlations
@@ -1020,6 +1025,7 @@ config.script.run({
   
   ## run socio-technical analysis
   sociotechnical.analysis(sociotechdir, codedir, conf)
+  create.community.smells.report(sociotechdir)
   create.global.report.graphs(sociotechdir)
   community.smell.correlation.analysis(sociotechdir)
 })
