@@ -89,9 +89,9 @@ load.global.graph <- function(mail.graph, code.graph) {
     }
   }
   
-  ## If only one code developer, we are done
-  if (length(V(code.graph)$id) == 1) {
-    return(code.graph)
+  ## If only one code developer or no collaborations, we are done
+  if ((length(V(code.graph)$id) == 1) | (length(E(code.graph)) == 0)) {
+    return(global.graph)
   }
   
   ## retrieve collaboration edges and add them to the global graph
