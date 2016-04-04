@@ -813,7 +813,7 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
 
     
     ## Graph report creation
-    pdf(file.path(sociotechdir, "ranges", paste(ranges[range], ".pdf")))
+    pdf(file.path(sociotechdir, "ranges", paste(ranges[range], ".pdf", sep="")))
     ## Collaboration and communication graphs
     plot.igraph(
       mail.graph, vertex.size=3, vertex.label=NA, layout=layout.spring(mail.graph),
@@ -883,7 +883,7 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
     }
     ## Community smell: Black-cloud effect
     if (length(smell.black.cloud) > 0) {
-      g2 <- graph_from_edgelist(strsplit(smell.black.cloud, "-"),directed=FALSE)
+      g2 <- graph_from_edgelist(matrix(unlist(strsplit(smell.black.cloud, "-")), ncol=2, byrow=TRUE), directed=FALSE)
       V(g2)$id <- V(g2)$name
       V(g2)$name <- V(mail.graph)[V(mail.graph)$id %in% V(g2)$id]$name
       plot(g2, main="Community smell: Black clouds", vertex.size=3, vertex.label=NA,  
