@@ -654,9 +654,9 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
     code.graph <- load.code.graph(rangedir)
     global.graph <- load.global.graph(mail.graph, code.graph)
     ## find cummunities within the communication and collaboration graph
-    mail.clusters <- cluster_louvain(mail.graph, weights=E(mail.graph)$weight)
-    code.clusters <- cluster_louvain(code.graph, weights=E(code.graph)$weight)
-    global.clusters <- cluster_louvain(global.graph, weights=E(global.graph)$weight)
+    mail.clusters <- walktrap.community(mail.graph, weights=E(mail.graph)$weight)
+    code.clusters <- walktrap.community(code.graph, weights=E(code.graph)$weight)
+    global.clusters <- walktrap.community(global.graph, weights=E(global.graph)$weight)
     
     ## Check community smells
     smell.org.silo <- community.smell.organizational.silo(mail.graph, code.graph)
