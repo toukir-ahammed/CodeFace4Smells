@@ -73,6 +73,16 @@ def project_analyse(resdir, gitdir, codeface_conf, project_conf,
     repo = pathjoin(gitdir, conf["repo"], ".git")
     project_resdir = pathjoin(resdir, project, tagging)
     range_by_date = False
+    
+    ## if 6 months window analysis is specified generate the related
+    ## configuration. At most 5 years are considered.
+    if conf["revisions"] == "6months":
+        window_size_months = 6 # Window size in months
+        num_window = 10  # analyze last 5 years
+        revs, rcs = generate_analysis_windows(repo, window_size_months)
+        conf["revisions"] = revs[-num_window-1:]
+        conf["rcs"] = rcs[-num_window-1:]
+        range_by_date = True
 
     # When revisions are not provided by the configuration file
     # generate the analysis window automatically

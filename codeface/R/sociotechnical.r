@@ -213,7 +213,7 @@ community.smell.potential.black.cloud <- function (mail.graph, clusters) {
 ## graph, return the sub-community ids behaving as prima-donnas.
 ## It is possible to specify the threshold to consider two sub-communities collaborating.
 ## It is possible to re-use pre-computed potential black links
-community.smell.primadonnas <- function (mail.graph, clusters, code.graph, collaboration=0.3, 
+community.smell.primadonnas <- function (mail.graph, clusters, code.graph, collaboration=0.2, 
                                          precomputed.black=NA) {
   primadonnas <- list()
   memships <- membership(clusters)
@@ -392,15 +392,6 @@ create.global.report.graphs <- function(sociotechdir) {
   legend("topright", c("Collaboraion", "Communication", "Global", "Sponsored"), 
          cex=0.6, bg="white", fill=col.id)
   
-  ## development time
-  plot(repo$days / 30, type="o", col="blue", ylim=c(0, max(repo$days / 30)), xaxt="n", ann=FALSE)
-  axis(1, at=seq(1, length(repo$range), 1))
-  abline(h=seq(0, max(repo$days / 30), 1), v=1:length(repo$range), col="gray", lty=3)
-  title(main="Development time", col.main="red", font.main=4)
-  title(xlab="Ranges")
-  title(ylab="Months")
-  box()
-  
   ## Community smells
   col.id <- rainbow(5, alpha=1) 
   maxy <- max(repo$org.silo, repo$prima.donnas, repo$radio.silence ,repo$black.cloud, repo$missing.links)
@@ -523,9 +514,9 @@ create.correlations.report.tex <- function(sociotechdir, pears.df.e, pears.df.p,
         "\\setlength{\\parindent}{0pt}\n", "\\begin{center}\n", "\\begin{Large}\n",
         "\\textbf{Community smells: Pearson's correlation}\n", "\\end{Large}"),
       file=file.name)
-  for (iter in 1:((ncol(pears.df.e) / 21) + 1)) {
-    ini <- (iter - 1) * 21 + 1
-    fin <- min(ini + 20, ncol(pears.df.e))
+  for (iter in 1:((ncol(pears.df.e) / 20) + 1)) {
+    ini <- (iter - 1) * 20 + 1
+    fin <- min(ini + 19, ncol(pears.df.e))
     print(xtable(pears.df.e[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
@@ -533,9 +524,9 @@ create.correlations.report.tex <- function(sociotechdir, pears.df.e, pears.df.p,
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
         "\\textbf{Community smells: Pearson's correlation - p-values}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(pears.df.p) / 21) + 1)) {
-    ini <- (iter - 1) * 21 + 1
-    fin <- min(ini + 20, ncol(pears.df.p))
+  for (iter in 1:((ncol(pears.df.p) / 20) + 1)) {
+    ini <- (iter - 1) * 20 + 1
+    fin <- min(ini + 19, ncol(pears.df.p))
     print(xtable(pears.df.p[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
@@ -543,9 +534,9 @@ create.correlations.report.tex <- function(sociotechdir, pears.df.e, pears.df.p,
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
         "\\textbf{Community smells: Spearman's correlation}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(spear.df.e) / 21) + 1)) {
-    ini <- (iter - 1) * 21 + 1
-    fin <- min(ini + 20, ncol(spear.df.e))
+  for (iter in 1:((ncol(spear.df.e) / 20) + 1)) {
+    ini <- (iter - 1) * 20 + 1
+    fin <- min(ini + 19, ncol(spear.df.e))
     print(xtable(spear.df.e[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
@@ -553,9 +544,9 @@ create.correlations.report.tex <- function(sociotechdir, pears.df.e, pears.df.p,
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
         "\\textbf{Community smells: Spearman's correlation - p-values}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(spear.df.p) / 21) + 1)) {
-    ini <- (iter - 1) * 21 + 1
-    fin <- min(ini + 20, ncol(spear.df.p))
+  for (iter in 1:((ncol(spear.df.p) / 20) + 1)) {
+    ini <- (iter - 1) * 20 + 1
+    fin <- min(ini + 19, ncol(spear.df.p))
     print(xtable(spear.df.p[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
@@ -565,10 +556,10 @@ create.correlations.report.tex <- function(sociotechdir, pears.df.e, pears.df.p,
 
 ## Generate latex report file about community smells
 create.community.smells.report <- function(sociotechdir) {
-  df <- read.csv(file.path(sociotechdir, "report.csv"))
+  df <- read.csv(file.path(sociotechdir, "report.csv"))[, -1]
   file.name <- file.path(sociotechdir, "report.tex")
   ## set the decimal digits
-  dig <- c(0,0,0,0,0,0,4,4,4,0,4,0,4,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0)
+  dig <- c(0,0,0,0,0,4,4,4,0,4,0,4,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0)
   cat(c("\\documentclass{article}\n",
         "\\usepackage[landscape,a4paper,pdftex,top=5mm,bottom=5mm,left=5mm,right=5mm]{geometry}\n",
         "\\usepackage{graphicx}\n", "\\usepackage{calc}\n", "\\usepackage{lmodern}\n", "\\begin{document}\n",
@@ -641,7 +632,6 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
   all.metric.mail.truck <- c()
   all.metric.code.truck <- c()
   all.metric.timezones <- c()
-  all.metric.range.days <- c()
   
   ## perform socio-techincal analysis for every range available
   for (range in 1:length(ranges)) {
@@ -693,9 +683,6 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
     ## Compute socio-technical metrics
     all.metric.congruence[range] <- community.metric.sociotechnical.congruence(mail.graph, code.graph)
     all.metric.communicability[range] <- community.metric.mean.communicability(mail.graph, code.graph)
-    
-    all.metric.range.days[range] <- difftime(bound$date.end[range], bound$date.start[range],
-                                       units="days")
     
     ## Core developers:
     ## retrieve core and peripheral devs of global, communication and coordination network
@@ -909,9 +896,11 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
   
   
   ## Global report generation
+  rages.date <- paste(format(bound$date.start, format = "%Y-%m"), 
+                     format(bound$date.end, format = "%Y-%m"), sep =" -- ")
   report.data <-
     data.frame(
-      ranges, floor(all.metric.range.days), all.devs, all.mail.only.devs, all.code.only.devs, all.mail.code.devs, 
+      ranges, rages.date, all.devs, all.mail.only.devs, all.code.only.devs, all.mail.code.devs, 
       round(all.mail.only.devs / all.devs, digits=4), round(all.code.only.devs / all.devs, digits=4), 
       round(all.mail.code.devs / all.devs, digits=4),
       all.devs.code.sponsored, round(all.devs.code.sponsored / all.devs, digits=4),
@@ -930,7 +919,7 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
       round(all.metric.global.modularity, digits=4), round(all.metric.mail.modularity, digits=4),
       round(all.metric.code.modularity, digits=4), round(all.metric.global.density, digits=4)
     )
-  colnames(report.data) <- c("range", "days", "devs", "ml.only.devs", "code.only.devs", "ml.code.devs",
+  colnames(report.data) <- c("range", "rage.date", "devs", "ml.only.devs", "code.only.devs", "ml.code.devs",
                              "perc.ml.only.devs", "perc.code.only.devs", "perc.ml.code.devs",
                              "sponsored.devs",  "perc.sponsored", "sponsored.core.devs", 
                              "perc.sponsored.core", "num.tz", "core.global.devs", "core.mail.devs", "core.code.devs",
@@ -947,7 +936,7 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
 community.smell.correlation.analysis <- function(sociotechdir) {
   repo <- read.csv(file.path(sociotechdir, "report.csv"))
   smells <- c("org.silo", "prima.donnas", "radio.silence", "black.cloud", "missing.links")
-  metrics <- setdiff(colnames(repo), "range")
+  metrics <- setdiff(colnames(repo), c("range", "rage.date"))
   zero <- c("black.cloud", "global.turnover", "code.turnover", "smelly.quitters",
             "core.code.turnover", "core.mail.turnover", "core.global.turnover")
   ## Compute Pearson

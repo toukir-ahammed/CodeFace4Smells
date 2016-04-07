@@ -20,6 +20,7 @@ Encapsulates a configuration as an immutable dict
 '''
 
 import yaml
+from shutil import copyfile
 from collections import Mapping
 from logging import getLogger;
 from codeface.linktype import LinkType
@@ -55,8 +56,8 @@ class Configuration(Mapping):
                 'idServiceHostname' : '127.0.0.1',
                 'idServicePort' : 8080
                 }
-
-	self._conf_file_loc = None
+        self._conf_file_loc = None
+        self._conf_file_substitute = False
 
     @classmethod
     def load(self, global_conffile, local_conffile=None):
@@ -66,6 +67,7 @@ class Configuration(Mapping):
         c = Configuration()
         log.devinfo("Loading global configuration file '{}'".
                 format(global_conffile))
+        self._local_conf_name = local_conffile
         self._global_conf = c._load(global_conffile)
         c._conf.update(c._global_conf)
         if local_conffile:
@@ -132,6 +134,11 @@ class Configuration(Mapping):
         if not self['tagging'] in LinkType.get_all_link_types():
             log.critical('Unsupported tagging mechanism specified!')
             raise ConfigurationError('Unsupported tagging mechanism.')
+        
+        if self["revisions"] == "6months":
+            self._conf_file_substitute = True
+            log.info("6 months ranges specified in configuration, analyzing history "
+                     "in 6 month increments for at most 5 years")
 
         if len(self["revisions"]) < 2:
             log.info("No revision range specified in configuration, analyzing history "
@@ -146,16 +153,29 @@ class Configuration(Mapping):
         unknown_keys = [k for k in self if k not in self.ALL_KEYS]
         for key in unknown_keys:
             log.warning("Unknown key '{}' in configuration.".format(key))
+            
+    def _substitute(self):
+        f = open(self._local_conf_name,'r')
+        filedata = f.read()
+        f.close()
+        filedata = filedata.replace('6months', str(self["revisions"]))
+        tmp_file = NamedTemporaryFile(mode='w', prefix=self._conf['project'],
+                                     delete=False)
+        tmp_file.write(filedata)
+        tmp_file.close()
+        copyfile(tmp_file.name, self._local_conf_name)
 
     def write(self):
-      conf_file = NamedTemporaryFile(mode='w', prefix=self._conf['project'],
+        conf_file = NamedTemporaryFile(mode='w', prefix=self._conf['project'],
                                      delete=False)
-      yaml.dump(self._conf, conf_file)
-      self._conf_file_loc = conf_file.name
-      conf_file.close()
+        yaml.dump(self._conf, conf_file)
+        self._conf_file_loc = conf_file.name
+        conf_file.close()
+        if (self._conf_file_substitute):
+            self._substitute()
 
     def get_conf_file_loc(self):
-      return self._conf_file_loc
+        return self._conf_file_loc
 
     # Function for the Configuration object to function as a dict
     def __getitem__(self, key):
