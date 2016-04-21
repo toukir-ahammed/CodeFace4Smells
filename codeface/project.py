@@ -79,9 +79,9 @@ def project_analyse(resdir, gitdir, codeface_conf, project_conf,
     if conf["revisions"] == "6months":
         window_size_months = 6 # Window size in months
         num_window = 10  # analyze last 5 years
-        revs, rcs = generate_analysis_windows(repo, window_size_months)
-        conf["revisions"] = revs[-num_window-1:]
-        conf["rcs"] = rcs[-num_window-1:]
+        revs, rcs = generate_analysis_windows(repo, window_size_months, num_window)
+        conf["revisions"] = revs
+        conf["rcs"] = rcs
         range_by_date = True
 
     # When revisions are not provided by the configuration file

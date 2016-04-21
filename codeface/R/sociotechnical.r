@@ -115,11 +115,11 @@ load.global.graph <- function(mail.graph, code.graph) {
 
 ############################### Community Smells####################################
 
-## Check the presence of organizational silo community smell.
+## Check the presence of organisational silo community smell.
 ## Given the communication and collaboration graphs (mailing lists and VCS)
 ## return the collaboration edges, analyzed in groups of two devs, in
 ## which one of co-committing devs do not communicate at all.
-community.smell.organizational.silo <- function (mail.graph, code.graph) {
+community.smell.organisational.silo <- function (mail.graph, code.graph) {
   ## discover develpers not present in the mailing list graph
   non.communicative.ids <- setdiff(V(code.graph)$id, V(mail.graph)$id)
   silos <- list()
@@ -131,7 +131,7 @@ community.smell.organizational.silo <- function (mail.graph, code.graph) {
       if ((collab %in% non.communicative.ids) & (collab < vert)) {
         next() 
       }
-      ## organizational silo smell detected
+      ## organisational silo smell detected
       silos[[length(silos) + 1]] <- c(vert, collab)
     }
   }
@@ -142,7 +142,7 @@ community.smell.organizational.silo <- function (mail.graph, code.graph) {
 ## Check the presence of missing links community smell.
 ## Given the communication and collaboration graphs (mailing lists and VCS)
 ## return the collaboration edges that do not have a communication counterpart.
-## It is possible to pass precomputed organizational silo community smell.
+## It is possible to pass precomputed organisational silo community smell.
 community.smell.missing.links <- function (mail.graph, code.graph, precomputed.silo=NA) {
   missing <- list()
   for (vert in V(code.graph)$id) {
@@ -163,14 +163,14 @@ community.smell.missing.links <- function (mail.graph, code.graph, precomputed.s
     }
   }
   
-  ## if no precoumputed organizational silo we are done
+  ## if no precoumputed organisational silo we are done
   if (length(precomputed.silo) == 0){
     return(missing)
   }
   
-  ## If organizational silo is not pre-computed, calculate it
+  ## If organisational silo is not pre-computed, calculate it
   if (is.na(precomputed.silo)){
-    precomputed.silo <- community.smell.organizational.silo(mail.graph, code.graph)
+    precomputed.silo <- community.smell.organisational.silo(mail.graph, code.graph)
   }
   ## Add the missing links due to developers abstence in the mailing lists
   for (edge in precomputed.silo) {
@@ -370,7 +370,7 @@ create.global.report.graphs <- function(sociotechdir) {
   lines(repo$sponsored.devs, type="o", col=col.id[5])
   title(main="Developers", col.main="red", font.main=4)
   title(xlab="Ranges")
-  title(ylab="Num. developers")
+  title(ylab="# developers")
   box()
   legend("topright", c("All devs", "Comm. only", "Coll. only", "Comm. & Coll.",
                       "Sponsored"), 
@@ -387,9 +387,9 @@ create.global.report.graphs <- function(sociotechdir) {
   lines(repo$sponsored.core.devs, type="o", col=col.id[4])
   title(main="Core developers", col.main="red", font.main=4)
   title(xlab="Ranges")
-  title(ylab="Num. developers")
+  title(ylab="# developers")
   box()
-  legend("topright", c("Collaboraion", "Communication", "Global", "Sponsored"), 
+  legend("topright", c("Collaboration", "Communication", "Global", "Sponsored"), 
          cex=0.6, bg="white", fill=col.id)
   
   ## Community smells
@@ -404,7 +404,7 @@ create.global.report.graphs <- function(sociotechdir) {
   lines(repo$missing.links, type="o", col=col.id[5])
   title(main="Community smells", col.main="red", font.main=4)
   title(xlab="Ranges")
-  title(ylab="Num. community smells")
+  title(ylab="# community smells")
   legend("topright", c("org.silo", "prima-donnas", "radio silence", "black-cloud", "missing links"), 
          cex=0.6, bg="white", fill=col.id)
   
@@ -417,7 +417,7 @@ create.global.report.graphs <- function(sociotechdir) {
   lines(repo$code.truck, type="o", col=col.id[3])
   title(main="Truck number", col.main="red", font.main=4)
   title(xlab="Ranges")
-  title(ylab="Values")
+  title(ylab="Truck number (%)")
   legend("topright", c("Global truck num", "Comm. truck num", "Coll. truck num"), cex=0.6, bg="white", fill=col.id)
   
   ## Turnover
@@ -429,7 +429,7 @@ create.global.report.graphs <- function(sociotechdir) {
   lines(repo$code.turnover, type="o", col=col.id[2])
   title(main="Turnover", col.main="red", font.main=4)
   title(xlab="Ranges")
-  title(ylab="Values")
+  title(ylab="Turnover (%)")
   legend("topright", c("Global", "Collaboration"), cex=0.6, bg="white", fill=col.id)
 
   ## Core turnover
@@ -440,30 +440,30 @@ create.global.report.graphs <- function(sociotechdir) {
   axis(1, at=seq(1, length(repo$range), 1))
   lines(repo$core.mail.turnover, type="o", col=col.id[2])
   lines(repo$core.global.turnover, type="o", col=col.id[3])
-  title(main="Core developer turnover", col.main="red", font.main=4)
+  title(main="Core members turnover", col.main="red", font.main=4)
   title(xlab="Ranges")
-  title(ylab="Values")
+  title(ylab="Turnover (%)")
   legend("topright", c("Collaboration", "Communication", "Global"), cex=0.6, bg="white", fill=col.id)
   
   ## Num timezones
-  barplot(repo$num.tz, ylab="num. timezones", xlab="Ranges", 
+  barplot(repo$num.tz, ylab="# timezones", xlab="Ranges", 
           names.arg=seq(1, length(repo$range), 1), col="violet", ylim=c(0, max(repo$num.tz) + 2), yaxt="n")
   title(main="Timezones", col.main="red", font.main=4)
   abline(h=1:(max(repo$num.tz) + 1), col="gray", lty=3)
   axis(2, at=seq(0,max(repo$num.tz) + 2, 2))
   
   ## Smelly quitters
-  barplot(repo$smelly.quitters, ylab="Smelly quitters ratio", xlab="Ranges", 
+  barplot(repo$ratio.smelly.quitters, ylab="Ratio", xlab="Ranges", 
          names.arg=seq(1, length(repo$range), 1), col="blue", ylim=c(0, 1), yaxt="n")
-  title(main="Smelly quitters", col.main="red", font.main=4)
+  title(main="Ratio smelly quitters", col.main="red", font.main=4)
   box()
   abline(h=seq(0, 1, 0.1), col="gray", lty=3)
   axis(2, at=seq(0,1, 0.1))
   
   ## Smelly devs
-  barplot(repo$smelly.devs, ylab="Smelly devs ratio", xlab="Ranges", 
+  barplot(repo$ratio.smelly.devs, ylab="Ratio", xlab="Ranges", 
          names.arg=seq(1, length(repo$range), 1), col="orange", ylim=c(0,1), yaxt="n")
-  title(main="Smelly devs", col.main="red", font.main=4)
+  title(main="Ratio smelly devs", col.main="red", font.main=4)
   box()
   abline(h=seq(0, 1, 0.1), col="gray", lty=3)
   axis(2, at=seq(0, 1, 0.1))
@@ -475,9 +475,9 @@ create.global.report.graphs <- function(sociotechdir) {
   abline(h=seq(0, 1, 0.1), v=1:length(repo$range), col="gray", lty=3)
   lines(repo$betweenness.centr, type="o", col="red")
   lines(repo$degree.centr, type="o", col="blue")
-  title(main="Network global closeness", col.main="red", font.main=4)
+  title(main="Global network closeness", col.main="red", font.main=4)
   title(xlab="Ranges")
-  title(ylab="Values")
+  title(ylab="Closeness")
   box()
   legend("topright", c("centralization", "betweenness", "degree"), 
          cex=0.6, bg="white", fill=c("orange", "red", "blue"))
@@ -490,30 +490,113 @@ create.global.report.graphs <- function(sociotechdir) {
   lines(repo$mail.mod, type="o", col="blue")
   title(main="Network modularity", col.main="red", font.main=4)
   title(xlab="Ranges")
-  title(ylab="Values")
+  title(ylab="Modularity")
   box()
   legend("topright", c("global", "collaboration", "communication"), 
          cex=0.6, bg="white", fill=c("orange", "red", "blue"))
   ## Density
-  plot(repo$density, type="o", col="purple", ylim=c(0,1), axes=FALSE, ann=FALSE)
+  plot(repo$density, type="o", col="purple", xaxt="n", ann=FALSE)
   axis(1, at=seq(1, length(repo$range), 1))
-  axis(2, at=seq(0, 1, 0.1))
-  abline(h=seq(0, 1, 0.1), v=1:length(repo$range), col="gray", lty=3)
+  abline(h=seq(0, 1, 0.005), v=1:length(repo$range), col="gray", lty=3)
   title(main="Global network density", col.main="red", font.main=4)
   title(xlab="Ranges")
-  title(ylab="Values")
+  title(ylab="Density")
   box()
 }
 
-## Generate latex report file about correlations
-create.correlations.report.tex <- function(sociotechdir, pears.df.e, pears.df.p, spear.df.e, spear.df.p) {
-  file.name <- file.path(sociotechdir, "correlations.tex")
+
+## Generate latex report file about community smells
+create.community.smells.report <- function(sociotechdir) {
+  ## retrieve socio-technical analysis results
+  df <- read.csv(file.path(sociotechdir, "report.csv"))[, -1]
+  file.name <- file.path(sociotechdir, "report.tex")
+  
+  ## compute Pearson's and Spearman's correlations
+  smells <- c("org.silo", "prima.donnas", "radio.silence", "black.cloud", "missing.links")
+  metrics <- setdiff(colnames(df), c("rage.date"))
+  zero <- c("black.cloud", "global.turnover", "code.turnover", "ratio.smelly.quitters",
+            "core.code.turnover", "core.mail.turnover", "core.global.turnover")
+  ## Compute Pearson
+  mat1.e <- matrix(, nrow=length(smells), ncol=length(metrics))
+  mat1.p <- matrix(, nrow=length(smells), ncol=length(metrics))
+  for (smell in 1:length(smells)) {
+    for (metric in 1:length(metrics)) {
+      if (metrics[metric] == smells[smell]) {
+        next()
+      }
+      ## if the first value is going to be a 0 by default, skip it
+      if(metrics[metric] %in% zero) {
+        cor <- cor.test(unlist(df[smells[smell]])[-1], unlist(df[metrics[metric]])[-1], 
+                        method="pearson")
+        mat1.p[smell,metric] <- cor$p.value
+        mat1.e[smell,metric] <- cor$estimate
+      } else{
+        cor <- cor.test(unlist(df[smells[smell]]), unlist(df[metrics[metric]]), 
+                        method="pearson")
+        mat1.p[smell,metric] <- cor$p.value
+        mat1.e[smell,metric] <- cor$estimate
+      }
+    }
+  }
+  pears.df.p <- data.frame(mat1.p)
+  pears.df.e <- data.frame(mat1.e)
+  colnames(pears.df.p) <- metrics
+  rownames(pears.df.p) <- smells
+  colnames(pears.df.e) <- metrics
+  rownames(pears.df.e) <- smells
+  
+  ## Compute Spearman
+  mat2.p <- matrix(, nrow=length(smells), ncol=length(metrics))
+  mat2.e <- matrix(, nrow=length(smells), ncol=length(metrics))
+  for (smell in 1:length(smells)) {
+    for (metric in 1:length(metrics)) {
+      if (metrics[metric] == smells[smell]) {
+        next()
+      }
+      ## if the first value is going to be a 0 by default, skip it
+      if(metrics[metric] %in% zero) {
+        cor <- cor.test(unlist(df[smells[smell]])[-1], unlist(df[metrics[metric]])[-1], 
+                        method="spearman")
+        mat2.p[smell,metric] <- cor$p.value
+        mat2.e[smell,metric] <- cor$estimate
+      } else {
+        cor <- cor.test(unlist(df[smells[smell]]), unlist(df[metrics[metric]]), 
+                        method="spearman")
+        mat2.p[smell,metric] <- cor$p.value
+        mat2.e[smell,metric] <- cor$estimate
+      }
+    }
+  }
+  spear.df.p <- data.frame(mat2.p)
+  spear.df.e <- data.frame(mat2.e)
+  colnames(spear.df.p) <- metrics
+  rownames(spear.df.p) <- smells
+  colnames(spear.df.e) <- metrics
+  rownames(spear.df.e) <- smells
+  
+  
+  ## generate lex file
+  ## set the decimal digits
+  dig <- c(0,0,0,0,0,4,4,4,0,4,0,4,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0)
   cat(c("\\documentclass{article}\n",
         "\\usepackage[landscape,a4paper,pdftex,top=5mm,bottom=5mm,left=5mm,right=5mm]{geometry}\n",
         "\\usepackage{graphicx}\n", "\\usepackage{calc}\n", "\\usepackage{lmodern}\n", "\\begin{document}\n",
         "\\setlength{\\parindent}{0pt}\n", "\\begin{center}\n", "\\begin{Large}\n",
-        "\\textbf{Community smells: Pearson's correlation}\n", "\\end{Large}"),
+        "\\textbf{Socio-technical analysis result}\n", "\\end{Large}"),
       file=file.name)
+  for (iter in 1:((ncol(df) / 23) + 1)) {
+    ini <- (iter - 1) * 23 + 1
+    fin <- min(ini + 22, ncol(df))
+    tab <- xtable(df[ini:fin])
+    digits(tab) <- c(0, dig[ini:fin])
+    print(tab, type="latex", floating=FALSE, file=file.name, append=TRUE,
+          sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
+          NA.string="-")
+  }
+  
+  cat(c("\n\\newpage\n", "\\begin{Large}\n",
+        "\\textbf{Community smells: Pearson's correlation}\n", "\\end{Large}"),
+      file=file.name, append=TRUE)
   for (iter in 1:((ncol(pears.df.e) / 20) + 1)) {
     ini <- (iter - 1) * 20 + 1
     fin <- min(ini + 19, ncol(pears.df.e))
@@ -551,29 +634,7 @@ create.correlations.report.tex <- function(sociotechdir, pears.df.e, pears.df.p,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
   }
-  cat(c("\n\\end{center}\n", "\\end{document}\n", "\\grid"), file=file.name, append=TRUE)
-}
 
-## Generate latex report file about community smells
-create.community.smells.report <- function(sociotechdir) {
-  df <- read.csv(file.path(sociotechdir, "report.csv"))[, -1]
-  file.name <- file.path(sociotechdir, "report.tex")
-  ## set the decimal digits
-  dig <- c(0,0,0,0,0,4,4,4,0,4,0,4,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0)
-  cat(c("\\documentclass{article}\n",
-        "\\usepackage[landscape,a4paper,pdftex,top=5mm,bottom=5mm,left=5mm,right=5mm]{geometry}\n",
-        "\\usepackage{graphicx}\n", "\\usepackage{calc}\n", "\\usepackage{lmodern}\n", "\\begin{document}\n",
-        "\\setlength{\\parindent}{0pt}\n", "\\begin{center}\n"),
-      file=file.name)
-  for (iter in 1:((ncol(df) / 23) + 1)) {
-    ini <- (iter - 1) * 23 + 1
-    fin <- min(ini + 22, ncol(df))
-    tab <- xtable(df[ini:fin])
-    digits(tab) <- c(0, dig[ini:fin])
-    print(tab, type="latex", floating=FALSE, file=file.name, append=TRUE,
-          sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
-          NA.string="-")
-  }
   cat(c("\n\\end{center}\n", "\\end{document}\n", "\\grid"), file=file.name, append=TRUE)
 }
 
@@ -649,7 +710,7 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
     global.clusters <- walktrap.community(global.graph, weights=E(global.graph)$weight)
     
     ## Check community smells
-    smell.org.silo <- community.smell.organizational.silo(mail.graph, code.graph)
+    smell.org.silo <- community.smell.organisational.silo(mail.graph, code.graph)
     all.smell.org.silo[range] <- length(smell.org.silo)
     smell.radiosilence <- community.smell.radio.silence(mail.graph, mail.clusters)
     all.smell.radiosilence[range] <- length(smell.radiosilence)
@@ -817,7 +878,7 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
       vertex.color=membership(global.clusters), 
       main="Global community network"
     )
-    ## Community smell: Organizational silo effect
+    ## Community smell: Organisational silo effect
     if (length(smell.org.silo) > 0) {
       ## Convert dev ids into node ids
       silo.node.ids <- list()
@@ -828,12 +889,12 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
       V(code.graph)[V(code.graph) %in% unique(unlist(silo.node.ids))]$color <- "red"
       plot.igraph(
         code.graph, vertex.size=3, vertex.label=NA,  layout=layout.spring(code.graph),
-        mark.groups=silo.node.ids, main="Community smell: Organizational silo effect", edge.color=NA
+        mark.groups=silo.node.ids, main="Community smell: Organisational silo effect", edge.color=NA
       )
       code.graph <- remove.vertex.attribute(code.graph, "color")
     } else {
       plot(0:10, type="n", xaxt="n", yaxt="n", bty="n", xlab="", ylab="")
-      text(5, 8, "Community smell: no organizational silo effect detected!")
+      text(5, 8, "Community smell: no organisational silo effect detected!")
     }
     ## Community smell: Missing links
     if (length(smell.missing.links) > 0) {
@@ -921,84 +982,15 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
     )
   colnames(report.data) <- c("range", "rage.date", "devs", "ml.only.devs", "code.only.devs", "ml.code.devs",
                              "perc.ml.only.devs", "perc.code.only.devs", "perc.ml.code.devs",
-                             "sponsored.devs",  "perc.sponsored", "sponsored.core.devs", 
-                             "perc.sponsored.core", "num.tz", "core.global.devs", "core.mail.devs", "core.code.devs",
+                             "sponsored.devs",  "ratio.sponsored", "sponsored.core.devs", 
+                             "ratio.sponsored.core", "num.tz", "core.global.devs", "core.mail.devs", "core.code.devs",
                              "org.silo", "prima.donnas", "radio.silence", "black.cloud", "missing.links",
                              "st.congruence", "communicability", "global.turnover", "code.turnover",
                              "core.global.turnover", "core.mail.turnover", "core.code.turnover", 
-                             "smelly.quitters", "smelly.devs", "global.truck", "mail.truck", "code.truck",
+                             "ratio.smelly.quitters", "ratio.smelly.devs", "global.truck", "mail.truck", "code.truck",
                              "closeness.centr", "betweenness.centr", "degree centr", 
                              "global.mod", "mail.mod", "code.mod", "density")
   write.csv(report.data, file=file.path(sociotechdir, "report.csv"), row.names=FALSE)
-}
-
-## compute Pearson's and Spearman's correlations
-community.smell.correlation.analysis <- function(sociotechdir) {
-  repo <- read.csv(file.path(sociotechdir, "report.csv"))
-  smells <- c("org.silo", "prima.donnas", "radio.silence", "black.cloud", "missing.links")
-  metrics <- setdiff(colnames(repo), c("range", "rage.date"))
-  zero <- c("black.cloud", "global.turnover", "code.turnover", "smelly.quitters",
-            "core.code.turnover", "core.mail.turnover", "core.global.turnover")
-  ## Compute Pearson
-  mat1.e <- matrix(, nrow=length(smells), ncol=length(metrics))
-  mat1.p <- matrix(, nrow=length(smells), ncol=length(metrics))
-  for (smell in 1:length(smells)) {
-    for (metric in 1:length(metrics)) {
-      if (metrics[metric] == smells[smell]) {
-        next()
-      }
-      ## if the first value is going to be a 0 by default, skip it
-      if(metrics[metric] %in% zero) {
-        cor <- cor.test(unlist(repo[smells[smell]])[-1], unlist(repo[metrics[metric]])[-1], 
-                        method="pearson")
-        mat1.p[smell,metric] <- cor$p.value
-        mat1.e[smell,metric] <- cor$estimate
-      } else{
-        cor <- cor.test(unlist(repo[smells[smell]]), unlist(repo[metrics[metric]]), 
-                        method="pearson")
-        mat1.p[smell,metric] <- cor$p.value
-        mat1.e[smell,metric] <- cor$estimate
-      }
-    }
-  }
-  pears.df.p <- data.frame(mat1.p)
-  pears.df.e <- data.frame(mat1.e)
-  colnames(pears.df.p) <- metrics
-  rownames(pears.df.p) <- smells
-  colnames(pears.df.e) <- metrics
-  rownames(pears.df.e) <- smells
-  
-  ## Compute Spearman
-  mat2.p <- matrix(, nrow=length(smells), ncol=length(metrics))
-  mat2.e <- matrix(, nrow=length(smells), ncol=length(metrics))
-  for (smell in 1:length(smells)) {
-    for (metric in 1:length(metrics)) {
-      if (metrics[metric] == smells[smell]) {
-        next()
-      }
-      ## if the first value is going to be a 0 by default, skip it
-      if(metrics[metric] %in% zero) {
-        cor <- cor.test(unlist(repo[smells[smell]])[-1], unlist(repo[metrics[metric]])[-1], 
-                        method="spearman")
-        mat2.p[smell,metric] <- cor$p.value
-        mat2.e[smell,metric] <- cor$estimate
-      } else {
-        cor <- cor.test(unlist(repo[smells[smell]]), unlist(repo[metrics[metric]]), 
-                        method="spearman")
-        mat2.p[smell,metric] <- cor$p.value
-        mat2.e[smell,metric] <- cor$estimate
-      }
-    }
-  }
-  spear.df.p <- data.frame(mat2.p)
-  spear.df.e <- data.frame(mat2.e)
-  colnames(spear.df.p) <- metrics
-  rownames(spear.df.p) <- smells
-  colnames(spear.df.e) <- metrics
-  rownames(spear.df.e) <- smells
-  
-  ## Generate tex report
-  create.correlations.report.tex(sociotechdir, pears.df.e, pears.df.p, spear.df.e, spear.df.p)
 }
 
 
@@ -1016,5 +1008,4 @@ config.script.run({
   sociotechnical.analysis(sociotechdir, codedir, conf)
   create.community.smells.report(sociotechdir)
   create.global.report.graphs(sociotechdir)
-  community.smell.correlation.analysis(sociotechdir)
 })

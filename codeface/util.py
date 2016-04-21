@@ -376,16 +376,6 @@ def generate_report_st(stdir):
     cmd = []
     cmd.append("lualatex")
     cmd.append("-interaction=nonstopmode")
-    cmd.append(os.path.join(stdir, "correlations.tex"))
-    execute_command(cmd, ignore_errors=True)
-    try:
-        shutil.copy("correlations.pdf", stdir)
-    except IOError:
-        log.warning("Could not copy report PDF (missing input data?)")
-        
-    cmd = []
-    cmd.append("lualatex")
-    cmd.append("-interaction=nonstopmode")
     cmd.append(os.path.join(stdir, "report.tex"))
     execute_command(cmd, ignore_errors=True)
     try:
@@ -461,7 +451,7 @@ def parse_iso_git_date(date_string):
     return parsed_date
 
 
-def generate_analysis_windows(repo, window_size_months):
+def generate_analysis_windows(repo, window_size_months, num_windows=None):
     """
     Generates a list of revisions (commit hash) in increments of the window_size
     parameter. The window_size parameter specifies the number of months between
@@ -491,6 +481,11 @@ def generate_analysis_windows(repo, window_size_months):
     revs.extend(rev_end)
 
     while start != end:
+        if (not (num_windows is None)):
+            if num_windows==0:
+                break
+            num_windows = num_windows - 1
+        
         cmd = cmd_base_max1 + [get_before_arg(start)]
         rev_start = execute_command(cmd).splitlines()
 
