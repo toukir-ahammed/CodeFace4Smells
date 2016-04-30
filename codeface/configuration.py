@@ -135,10 +135,10 @@ class Configuration(Mapping):
             log.critical('Unsupported tagging mechanism specified!')
             raise ConfigurationError('Unsupported tagging mechanism.')
         
-        if self["revisions"] == "6months":
+        if self["revisions"] == "3months":
             self._conf_file_substitute = True
-            log.info("6 months ranges specified in configuration, analyzing history "
-                     "in 6 month increments for at most 5 years")
+            log.info("3 months ranges specified in configuration, analyzing history "
+                     "in 3 month increments for at most 3 years")
 
         if len(self["revisions"]) < 2:
             log.info("No revision range specified in configuration, analyzing history "
@@ -158,7 +158,7 @@ class Configuration(Mapping):
         f = open(self._local_conf_name,'r')
         filedata = f.read()
         f.close()
-        filedata = filedata.replace('6months', str(self["revisions"]))
+        filedata = filedata.replace('3months', str(self["revisions"]))
         tmp_file = NamedTemporaryFile(mode='w', prefix=self._conf['project'],
                                      delete=False)
         tmp_file.write(filedata)

@@ -1465,10 +1465,14 @@ class gitVCS (VCS):
 
         #query git to get all committers to a particular file
         #includes commit hash, author and committer data and time
-        logMsg = self._getFileCommitInfo(fname, rev_start, rev_end)
-
-        #store the commit hash to the fileCommitList
-        cmtList = map(self._Logstring2Commit, logMsg)
+        cmtList = None
+        try:
+            logMsg = self._getFileCommitInfo(fname, rev_start, rev_end)
+            #store the commit hash to the fileCommitList
+            cmtList = map(self._Logstring2Commit, logMsg)
+        except:
+            log.info("=> Codeface is not able to analyse this. Skipping..")
+        
 
         return cmtList
 

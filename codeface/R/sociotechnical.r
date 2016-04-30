@@ -359,8 +359,8 @@ community.metric.mean.communicability <- function (mail.graph, code.graph) {
 create.global.report.graphs <- function(sociotechdir) {
   repo <- read.csv(file.path(sociotechdir, "report.csv"))
   pdf(file.path(sociotechdir, "graphs.pdf"))
+  col.id <- c("#F15854", "#5DA5DA", "#60BD68", "BLACK", "#FAA43A", "#B276B2", "#DECF3F", "#F17CB0", "#B2912F")
   ## Developers
-  col.id <- rainbow(5, alpha=1) 
   plot(repo$devs, type="o", col=col.id[1], ylim=c(0, max(repo$devs)), xaxt="n", ann=FALSE)
   axis(1, at=seq(1, length(repo$range), 1))
   abline(h=seq(0, max(repo$devs), 20), v=1:length(repo$range), col="gray", lty=3)
@@ -377,7 +377,6 @@ create.global.report.graphs <- function(sociotechdir) {
          cex=0.6, bg="white", fill=col.id)
   
   ## core devs
-  col.id <- rainbow(4, alpha=1) 
   maxy <- max(repo$core.code.devs, repo$core.mail.devs, repo$core.global.devs, repo$sponsored.core.devs)
   plot(repo$core.code.devs, type="o", col=col.id[1], ylim=c(0,maxy), xaxt="n", ann=FALSE)
   abline(h=seq(0, max(repo$core.global.devs), 10), v=1:length(repo$range), col="gray", lty=3)
@@ -393,7 +392,6 @@ create.global.report.graphs <- function(sociotechdir) {
          cex=0.6, bg="white", fill=col.id)
   
   ## Community smells
-  col.id <- rainbow(5, alpha=1) 
   maxy <- max(repo$org.silo, repo$prima.donnas, repo$radio.silence ,repo$black.cloud, repo$missing.links)
   plot(repo$org.silo, type="o", col=col.id[1], ylim=c(0, maxy), xaxt="n", ann=FALSE)
   axis(1, at=seq(1, length(repo$range), 1))
@@ -409,7 +407,6 @@ create.global.report.graphs <- function(sociotechdir) {
          cex=0.6, bg="white", fill=col.id)
   
   ## Truck number
-  col.id <- rainbow(3, alpha=1) 
   plot(repo$global.truck, type="o", col=col.id[1], ylim=c(0, 1), xaxt="n", ann=FALSE)
   axis(1, at=seq(1, length(repo$range), 1))
   abline(h=seq(0, 1, 0.1), v=1:length(repo$range), col="gray", lty=3)
@@ -421,7 +418,6 @@ create.global.report.graphs <- function(sociotechdir) {
   legend("topright", c("Global truck num", "Comm. truck num", "Coll. truck num"), cex=0.6, bg="white", fill=col.id)
   
   ## Turnover
-  col.id <- rainbow(2, alpha=1) 
   maxy <- max(1, repo$global.turnover, repo$code.turnover)
   plot(repo$global.turnover, type="o", col=col.id[1], ylim=c(0, maxy), xaxt="n", ann=FALSE)
   abline(h=seq(0, maxy + 0.1, 0.1), v=1:length(repo$range), col="gray", lty=3)
@@ -433,7 +429,6 @@ create.global.report.graphs <- function(sociotechdir) {
   legend("topright", c("Global", "Collaboration"), cex=0.6, bg="white", fill=col.id)
 
   ## Core turnover
-  col.id <- rainbow(3, alpha=1) 
   maxy <- max(1, repo$core.code.turnover, repo$core.mail.turnover, repo$core.global.turnover)
   plot(repo$core.code.turnover, type="o", col=col.id[1], ylim=c(0, maxy), xaxt="n", ann=FALSE)
   abline(h=seq(0, maxy + 0.1, 0.1), v=1:length(repo$range), col="gray", lty=3)
@@ -447,14 +442,14 @@ create.global.report.graphs <- function(sociotechdir) {
   
   ## Num timezones
   barplot(repo$num.tz, ylab="# timezones", xlab="Ranges", 
-          names.arg=seq(1, length(repo$range), 1), col="violet", ylim=c(0, max(repo$num.tz) + 2), yaxt="n")
+          names.arg=seq(1, length(repo$range), 1), col="gray30", ylim=c(0, max(repo$num.tz) + 2), yaxt="n")
   title(main="Timezones", col.main="red", font.main=4)
   abline(h=1:(max(repo$num.tz) + 1), col="gray", lty=3)
   axis(2, at=seq(0,max(repo$num.tz) + 2, 2))
   
   ## Smelly quitters
   barplot(repo$ratio.smelly.quitters, ylab="Ratio", xlab="Ranges", 
-         names.arg=seq(1, length(repo$range), 1), col="blue", ylim=c(0, 1), yaxt="n")
+         names.arg=seq(1, length(repo$range), 1), col="gray30", ylim=c(0, 1), yaxt="n")
   title(main="Ratio smelly quitters", col.main="red", font.main=4)
   box()
   abline(h=seq(0, 1, 0.1), col="gray", lty=3)
@@ -462,40 +457,42 @@ create.global.report.graphs <- function(sociotechdir) {
   
   ## Smelly devs
   barplot(repo$ratio.smelly.devs, ylab="Ratio", xlab="Ranges", 
-         names.arg=seq(1, length(repo$range), 1), col="orange", ylim=c(0,1), yaxt="n")
+         names.arg=seq(1, length(repo$range), 1), col="gray30", ylim=c(0,1), yaxt="n")
   title(main="Ratio smelly devs", col.main="red", font.main=4)
   box()
   abline(h=seq(0, 1, 0.1), col="gray", lty=3)
   axis(2, at=seq(0, 1, 0.1))
   
   ## Closeness
-  plot(repo$closeness.centr, type="o", col="orange", ylim=c(0, 1), axes=FALSE, ann=FALSE)
+  plot(repo$closeness.centr, type="o", col=col.id[1], ylim=c(0, 1), axes=FALSE, ann=FALSE)
   axis(1, at=seq(1, length(repo$range), 1))
   axis(2, at=seq(0, 1, 0.1))
   abline(h=seq(0, 1, 0.1), v=1:length(repo$range), col="gray", lty=3)
-  lines(repo$betweenness.centr, type="o", col="red")
-  lines(repo$degree.centr, type="o", col="blue")
+  lines(repo$betweenness.centr, type="o", col=col.id[2])
+  lines(repo$degree.centr, type="o", col=col.id[3])
   title(main="Global network closeness", col.main="red", font.main=4)
   title(xlab="Ranges")
   title(ylab="Closeness")
   box()
   legend("topright", c("centralization", "betweenness", "degree"), 
-         cex=0.6, bg="white", fill=c("orange", "red", "blue"))
+         cex=0.6, bg="white", fill=col.id)
+  
   ## Modularity
-  plot(repo$global.mod, type="o", col="orange", ylim=c(0,1), axes=FALSE, ann=FALSE)
+  plot(repo$global.mod, type="o", col=col.id[1], ylim=c(0,1), axes=FALSE, ann=FALSE)
   axis(1, at=seq(1, length(repo$range), 1))
   axis(2, at=seq(0, 1, 0.1))
   abline(h=seq(0, 1, 0.1), v=1:length(repo$range), col="gray", lty=3)
-  lines(repo$code.mod, type="o", col="red")
-  lines(repo$mail.mod, type="o", col="blue")
+  lines(repo$code.mod, type="o", col=col.id[2])
+  lines(repo$mail.mod, type="o", col=col.id[3])
   title(main="Network modularity", col.main="red", font.main=4)
   title(xlab="Ranges")
   title(ylab="Modularity")
   box()
   legend("topright", c("global", "collaboration", "communication"), 
          cex=0.6, bg="white", fill=c("orange", "red", "blue"))
+  
   ## Density
-  plot(repo$density, type="o", col="purple", xaxt="n", ann=FALSE)
+  plot(repo$density, type="o", col=col.id[1], xaxt="n", ann=FALSE)
   axis(1, at=seq(1, length(repo$range), 1))
   abline(h=seq(0, 1, 0.005), v=1:length(repo$range), col="gray", lty=3)
   title(main="Global network density", col.main="red", font.main=4)

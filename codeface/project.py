@@ -74,11 +74,11 @@ def project_analyse(resdir, gitdir, codeface_conf, project_conf,
     project_resdir = pathjoin(resdir, project, tagging)
     range_by_date = False
     
-    ## if 6 months window analysis is specified generate the related
-    ## configuration. At most 5 years are considered.
-    if conf["revisions"] == "6months":
-        window_size_months = 6 # Window size in months
-        num_window = 10  # analyze last 5 years
+    ## if 3 months window analysis is specified generate the related
+    ## configuration. At most 3 years are considered.
+    if conf["revisions"] == "3months":
+        window_size_months = 3 # Window size in months
+        num_window = 12  # analyze last 3 years
         revs, rcs = generate_analysis_windows(repo, window_size_months, num_window)
         conf["revisions"] = revs
         conf["rcs"] = rcs
