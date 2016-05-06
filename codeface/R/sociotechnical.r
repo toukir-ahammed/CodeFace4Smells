@@ -489,7 +489,7 @@ create.global.report.graphs <- function(sociotechdir) {
   title(ylab="Modularity")
   box()
   legend("topright", c("global", "collaboration", "communication"), 
-         cex=0.6, bg="white", fill=c("orange", "red", "blue"))
+         cex=0.6, bg="white", fill=col.id)
   
   ## Density
   plot(repo$density, type="o", col=col.id[1], xaxt="n", ann=FALSE)
