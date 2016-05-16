@@ -58,6 +58,8 @@ load.mailinglist.graph <- function(conf, start.date, end.date) {
   ## retrieve communications from db
   res <- query.mail.edgelist(conf$con, conf$pid, start.date, end.date)
   ## if we do not have email collaboration data, terminate the analysis
+  loginfo(start.date)
+  loginfo(end.date)
   if (length(res) == 0) {
     loginfo("Missing mailing lits data. Terminating..")
     stop()
@@ -502,7 +504,9 @@ create.global.report.graphs <- function(sociotechdir) {
 }
 
 
-## Generate latex report file about community smells
+## Generate latex report file about community smells and their
+## Pearson and Spearman correlations with socio-technical
+## quality metrics.
 create.community.smells.report <- function(sociotechdir) {
   ## retrieve socio-technical analysis results
   df <- read.csv(file.path(sociotechdir, "report.csv"))[, -1]
@@ -522,13 +526,13 @@ create.community.smells.report <- function(sociotechdir) {
         next()
       }
       ## if the first value is going to be a 0 by default, skip it
-      if(metrics[metric] %in% zero) {
-        cor <- cor.test(unlist(df[smells[smell]])[-1], unlist(df[metrics[metric]])[-1], 
+      if((metrics[metric] %in% zero) || (smells[smell] %in% zero)) {
+        cor <- cor.test(unlist(df[metrics[metric]])[-1], unlist(df[smells[smell]])[-1],
                         method="pearson")
         mat1.p[smell,metric] <- cor$p.value
         mat1.e[smell,metric] <- cor$estimate
       } else{
-        cor <- cor.test(unlist(df[smells[smell]]), unlist(df[metrics[metric]]), 
+        cor <- cor.test(unlist(df[metrics[metric]]), unlist(df[smells[smell]]),
                         method="pearson")
         mat1.p[smell,metric] <- cor$p.value
         mat1.e[smell,metric] <- cor$estimate
@@ -551,13 +555,13 @@ create.community.smells.report <- function(sociotechdir) {
         next()
       }
       ## if the first value is going to be a 0 by default, skip it
-      if(metrics[metric] %in% zero) {
-        cor <- cor.test(unlist(df[smells[smell]])[-1], unlist(df[metrics[metric]])[-1], 
+      if((metrics[metric] %in% zero) || (smells[smell] %in% zero)) {
+        cor <- cor.test(unlist(df[metrics[metric]])[-1], unlist(df[smells[smell]])[-1],
                         method="spearman")
         mat2.p[smell,metric] <- cor$p.value
         mat2.e[smell,metric] <- cor$estimate
       } else {
-        cor <- cor.test(unlist(df[smells[smell]]), unlist(df[metrics[metric]]), 
+        cor <- cor.test(unlist(df[metrics[metric]]), unlist(df[smells[smell]]),
                         method="spearman")
         mat2.p[smell,metric] <- cor$p.value
         mat2.e[smell,metric] <- cor$estimate
@@ -571,19 +575,24 @@ create.community.smells.report <- function(sociotechdir) {
   colnames(spear.df.e) <- metrics
   rownames(spear.df.e) <- smells
   
+  ## write correlations to csv files
+  write.csv(pears.df.e, file=file.path(sociotechdir, "pearson-estimate.csv"))
+  write.csv(pears.df.p, file=file.path(sociotechdir, "pearson-pvalue.csv"))
+  write.csv(spear.df.e, file=file.path(sociotechdir, "spearman-estimate.csv"))
+  write.csv(spear.df.p, file=file.path(sociotechdir, "spearman-pvalue.csv"))
   
   ## generate lex file
   ## set the decimal digits
-  dig <- c(0,0,0,0,0,4,4,4,0,4,0,4,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0)
+  dig <- c(0,0,0,0,0,4,4,4,0,4,0,4,0,0,0,0,0,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,4,4,4)
   cat(c("\\documentclass{article}\n",
         "\\usepackage[landscape,a4paper,pdftex,top=5mm,bottom=5mm,left=5mm,right=5mm]{geometry}\n",
         "\\usepackage{graphicx}\n", "\\usepackage{calc}\n", "\\usepackage{lmodern}\n", "\\begin{document}\n",
         "\\setlength{\\parindent}{0pt}\n", "\\begin{center}\n", "\\begin{Large}\n",
         "\\textbf{Socio-technical analysis result}\n", "\\end{Large}"),
       file=file.name)
-  for (iter in 1:((ncol(df) / 23) + 1)) {
-    ini <- (iter - 1) * 23 + 1
-    fin <- min(ini + 22, ncol(df))
+  for (iter in 1:((ncol(df) / 26) + 1)) {
+    ini <- (iter - 1) * 26 + 1
+    fin <- min(ini + 25, ncol(df))
     tab <- xtable(df[ini:fin])
     digits(tab) <- c(0, dig[ini:fin])
     print(tab, type="latex", floating=FALSE, file=file.name, append=TRUE,
@@ -594,9 +603,9 @@ create.community.smells.report <- function(sociotechdir) {
   cat(c("\n\\newpage\n", "\\begin{Large}\n",
         "\\textbf{Community smells: Pearson's correlation}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(pears.df.e) / 20) + 1)) {
-    ini <- (iter - 1) * 20 + 1
-    fin <- min(ini + 19, ncol(pears.df.e))
+  for (iter in 1:((ncol(pears.df.e) / 25) + 1)) {
+    ini <- (iter - 1) * 25 + 1
+    fin <- min(ini + 24, ncol(pears.df.e))
     print(xtable(pears.df.e[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
@@ -604,9 +613,9 @@ create.community.smells.report <- function(sociotechdir) {
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
         "\\textbf{Community smells: Pearson's correlation - p-values}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(pears.df.p) / 20) + 1)) {
-    ini <- (iter - 1) * 20 + 1
-    fin <- min(ini + 19, ncol(pears.df.p))
+  for (iter in 1:((ncol(pears.df.p) / 25) + 1)) {
+    ini <- (iter - 1) * 25 + 1
+    fin <- min(ini + 24, ncol(pears.df.p))
     print(xtable(pears.df.p[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
@@ -614,9 +623,9 @@ create.community.smells.report <- function(sociotechdir) {
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
         "\\textbf{Community smells: Spearman's correlation}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(spear.df.e) / 20) + 1)) {
-    ini <- (iter - 1) * 20 + 1
-    fin <- min(ini + 19, ncol(spear.df.e))
+  for (iter in 1:((ncol(spear.df.e) / 25) + 1)) {
+    ini <- (iter - 1) * 25 + 1
+    fin <- min(ini + 24, ncol(spear.df.e))
     print(xtable(spear.df.e[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
@@ -624,14 +633,14 @@ create.community.smells.report <- function(sociotechdir) {
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
         "\\textbf{Community smells: Spearman's correlation - p-values}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(spear.df.p) / 20) + 1)) {
-    ini <- (iter - 1) * 20 + 1
-    fin <- min(ini + 19, ncol(spear.df.p))
+  for (iter in 1:((ncol(spear.df.p) / 25) + 1)) {
+    ini <- (iter - 1) * 25 + 1
+    fin <- min(ini + 24, ncol(spear.df.p))
     print(xtable(spear.df.p[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
   }
-
+  
   cat(c("\n\\end{center}\n", "\\end{document}\n", "\\grid"), file=file.name, append=TRUE)
 }
 
@@ -661,6 +670,9 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
   all.devs.sponsored.core <- c()
   all.devs.mail.core <- c()
   all.devs.global.core <- c()
+  all.devs.code.only.core <- c()
+  all.devs.mail.only.core <- c()
+  all.devs.ml.code.core <- c()
   all.devs.peripheral <- c()
   all.mail.only.devs <- c()
   all.code.only.devs <- c()
@@ -765,7 +777,11 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
     all.devs.code.core[range] <- length(devs.code.core)
     all.devs.mail.core[range] <- length(devs.mail.core)
     all.devs.global.core[range] <- length(devs.global.core)
-    
+    devs.ml.code.core <- intersect(devs.code.core, devs.mail.core)
+    all.devs.ml.code.core[range] <- length(devs.ml.code.core)
+    all.devs.mail.only.core[range] <- all.devs.mail.core[range] - all.devs.ml.code.core[range]
+    all.devs.code.only.core[range] <- all.devs.code.core[range] - all.devs.ml.code.core[range]
+
     ## truck number
     all.metric.code.truck[range] <- ((length(V(code.graph)) - all.devs.code.core[range]) 
                                      / length(V(code.graph)))
@@ -975,7 +991,11 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
       round(all.metric.global.centralization.betweenness, digits=4), 
       round(all.metric.global.centralization.degree, digits=4),
       round(all.metric.global.modularity, digits=4), round(all.metric.mail.modularity, digits=4),
-      round(all.metric.code.modularity, digits=4), round(all.metric.global.density, digits=4)
+      round(all.metric.code.modularity, digits=4), round(all.metric.global.density, digits=4),
+      all.devs.mail.only.core, all.devs.code.only.core, all.devs.ml.code.core,
+      round(all.devs.mail.only.core / (all.devs.mail.only.core+all.devs.code.only.core+all.devs.ml.code.core), digits=4),
+      round(all.devs.code.only.core / (all.devs.mail.only.core+all.devs.code.only.core+all.devs.ml.code.core), digits=4),
+      round(all.devs.ml.code.core / (all.devs.mail.only.core+all.devs.code.only.core+all.devs.ml.code.core), digits=4)
     )
   colnames(report.data) <- c("range", "rage.date", "devs", "ml.only.devs", "code.only.devs", "ml.code.devs",
                              "perc.ml.only.devs", "perc.code.only.devs", "perc.ml.code.devs",
@@ -986,7 +1006,9 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
                              "core.global.turnover", "core.mail.turnover", "core.code.turnover", 
                              "ratio.smelly.quitters", "ratio.smelly.devs", "global.truck", "mail.truck", "code.truck",
                              "closeness.centr", "betweenness.centr", "degree centr", 
-                             "global.mod", "mail.mod", "code.mod", "density")
+                             "global.mod", "mail.mod", "code.mod", "density",
+                             "mail.only.core.devs", "code.only.core.devs", "ml.code.core.devs", 
+                             "ratio.mail.only.core", "ratio.code.only.core", "ratio.ml.code.core")
   write.csv(report.data, file=file.path(sociotechdir, "report.csv"), row.names=FALSE)
 }
 
