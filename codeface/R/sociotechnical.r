@@ -507,14 +507,14 @@ create.global.report.graphs <- function(sociotechdir) {
 ## Generate latex report file about community smells and their
 ## Pearson and Spearman correlations with socio-technical
 ## quality metrics.
-create.community.smells.report <- function(sociotechdir) {
+create.community.smells.report <- function(sociotechdir, project.name) {
   ## retrieve socio-technical analysis results
   df <- read.csv(file.path(sociotechdir, "report.csv"))[, -1]
   file.name <- file.path(sociotechdir, "report.tex")
   
   ## compute Pearson's and Spearman's correlations
   smells <- c("org.silo", "prima.donnas", "radio.silence", "black.cloud", "missing.links")
-  metrics <- setdiff(colnames(df), c("rage.date"))
+  metrics <- setdiff(colnames(df), c("range.date"))
   zero <- c("black.cloud", "global.turnover", "code.turnover", "ratio.smelly.quitters",
             "core.code.turnover", "core.mail.turnover", "core.global.turnover")
   ## Compute Pearson
@@ -588,7 +588,7 @@ create.community.smells.report <- function(sociotechdir) {
         "\\usepackage[landscape,a4paper,pdftex,top=5mm,bottom=5mm,left=5mm,right=5mm]{geometry}\n",
         "\\usepackage{graphicx}\n", "\\usepackage{calc}\n", "\\usepackage{lmodern}\n", "\\begin{document}\n",
         "\\setlength{\\parindent}{0pt}\n", "\\begin{center}\n", "\\begin{Large}\n",
-        "\\textbf{Socio-technical analysis result}\n", "\\end{Large}"),
+        "\\textbf{Socio-technical analysis result (", project.name,")}\n", "\\end{Large}"),
       file=file.name)
   for (iter in 1:((ncol(df) / 26) + 1)) {
     ini <- (iter - 1) * 26 + 1
@@ -601,7 +601,7 @@ create.community.smells.report <- function(sociotechdir) {
   }
   
   cat(c("\n\\newpage\n", "\\begin{Large}\n",
-        "\\textbf{Community smells: Pearson's correlation}\n", "\\end{Large}"),
+        "\\textbf{Community smells: Pearson's correlation (", project.name,")}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
   for (iter in 1:((ncol(pears.df.e) / 25) + 1)) {
     ini <- (iter - 1) * 25 + 1
@@ -611,7 +611,7 @@ create.community.smells.report <- function(sociotechdir) {
           NA.string="-")
   }
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
-        "\\textbf{Community smells: Pearson's correlation - p-values}\n", "\\end{Large}"),
+        "\\textbf{Community smells: Pearson's correlation - p-values (", project.name,")}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
   for (iter in 1:((ncol(pears.df.p) / 25) + 1)) {
     ini <- (iter - 1) * 25 + 1
@@ -621,7 +621,7 @@ create.community.smells.report <- function(sociotechdir) {
           NA.string="-")
   }
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
-        "\\textbf{Community smells: Spearman's correlation}\n", "\\end{Large}"),
+        "\\textbf{Community smells: Spearman's correlation (", project.name,")}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
   for (iter in 1:((ncol(spear.df.e) / 25) + 1)) {
     ini <- (iter - 1) * 25 + 1
@@ -631,7 +631,7 @@ create.community.smells.report <- function(sociotechdir) {
           NA.string="-")
   }
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
-        "\\textbf{Community smells: Spearman's correlation - p-values}\n", "\\end{Large}"),
+        "\\textbf{Community smells: Spearman's correlation - p-values (", project.name,")}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
   for (iter in 1:((ncol(spear.df.p) / 25) + 1)) {
     ini <- (iter - 1) * 25 + 1
@@ -970,11 +970,11 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
   
   
   ## Global report generation
-  rages.date <- paste(format(bound$date.start, format = "%Y-%m"), 
+  ranges.date <- paste(format(bound$date.start, format = "%Y-%m"), 
                      format(bound$date.end, format = "%Y-%m"), sep =" -- ")
   report.data <-
     data.frame(
-      ranges, rages.date, all.devs, all.mail.only.devs, all.code.only.devs, all.mail.code.devs, 
+      ranges, ranges.date, all.devs, all.mail.only.devs, all.code.only.devs, all.mail.code.devs, 
       round(all.mail.only.devs / all.devs, digits=4), round(all.code.only.devs / all.devs, digits=4), 
       round(all.mail.code.devs / all.devs, digits=4),
       all.devs.code.sponsored, round(all.devs.code.sponsored / all.devs, digits=4),
@@ -997,7 +997,7 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
       round(all.devs.code.only.core / (all.devs.mail.only.core+all.devs.code.only.core+all.devs.ml.code.core), digits=4),
       round(all.devs.ml.code.core / (all.devs.mail.only.core+all.devs.code.only.core+all.devs.ml.code.core), digits=4)
     )
-  colnames(report.data) <- c("range", "rage.date", "devs", "ml.only.devs", "code.only.devs", "ml.code.devs",
+  colnames(report.data) <- c("range", "range.date", "devs", "ml.only.devs", "code.only.devs", "ml.code.devs",
                              "perc.ml.only.devs", "perc.code.only.devs", "perc.ml.code.devs",
                              "sponsored.devs",  "ratio.sponsored", "sponsored.core.devs", 
                              "ratio.sponsored.core", "num.tz", "core.global.devs", "core.mail.devs", "core.code.devs",
@@ -1025,6 +1025,6 @@ config.script.run({
   
   ## run socio-technical analysis
   sociotechnical.analysis(sociotechdir, codedir, conf)
-  create.community.smells.report(sociotechdir)
+  create.community.smells.report(sociotechdir, conf$project)
   create.global.report.graphs(sociotechdir)
 })
