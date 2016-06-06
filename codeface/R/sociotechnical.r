@@ -603,9 +603,9 @@ create.community.smells.report <- function(sociotechdir, project.name) {
   cat(c("\n\\newpage\n", "\\begin{Large}\n",
         "\\textbf{Community smells: Pearson's correlation (", project.name,")}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(pears.df.e) / 24) + 1)) {
-    ini <- (iter - 1) * 24 + 1
-    fin <- min(ini + 23, ncol(pears.df.e))
+  for (iter in 1:((ncol(pears.df.e) / 23) + 1)) {
+    ini <- (iter - 1) * 23 + 1
+    fin <- min(ini + 22, ncol(pears.df.e))
     print(xtable(pears.df.e[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
@@ -613,9 +613,9 @@ create.community.smells.report <- function(sociotechdir, project.name) {
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
         "\\textbf{Community smells: Pearson's correlation - p-values (", project.name,")}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(pears.df.p) / 24) + 1)) {
-    ini <- (iter - 1) * 24 + 1
-    fin <- min(ini + 23, ncol(pears.df.p))
+  for (iter in 1:((ncol(pears.df.p) / 23) + 1)) {
+    ini <- (iter - 1) * 23 + 1
+    fin <- min(ini + 22, ncol(pears.df.p))
     print(xtable(pears.df.p[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
@@ -623,9 +623,9 @@ create.community.smells.report <- function(sociotechdir, project.name) {
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
         "\\textbf{Community smells: Spearman's correlation (", project.name,")}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(spear.df.e) / 24) + 1)) {
-    ini <- (iter - 1) * 24 + 1
-    fin <- min(ini + 23, ncol(spear.df.e))
+  for (iter in 1:((ncol(spear.df.e) / 23) + 1)) {
+    ini <- (iter - 1) * 23 + 1
+    fin <- min(ini + 22, ncol(spear.df.e))
     print(xtable(spear.df.e[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
@@ -633,9 +633,9 @@ create.community.smells.report <- function(sociotechdir, project.name) {
   cat(c("\n\\newpage\n", "\\begin{Large}\n", 
         "\\textbf{Community smells: Spearman's correlation - p-values (", project.name,")}\n", "\\end{Large}"),
       file=file.name, append=TRUE)
-  for (iter in 1:((ncol(spear.df.p) / 24) + 1)) {
-    ini <- (iter - 1) * 24 + 1
-    fin <- min(ini + 23, ncol(spear.df.p))
+  for (iter in 1:((ncol(spear.df.p) / 23) + 1)) {
+    ini <- (iter - 1) * 23 + 1
+    fin <- min(ini + 22, ncol(spear.df.p))
     print(xtable(spear.df.p[ini:fin]), type="latex", floating=FALSE, file=file.name, append=TRUE,
           sanitize.colnames.function=function(x) { return(paste("\\rotatebox{90}{", x, "}", sep="")) },
           NA.string="-")
