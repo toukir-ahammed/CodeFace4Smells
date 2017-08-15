@@ -19,9 +19,10 @@ Command-line interface driver for the codeface package
 Provides
 
 '''
+import os
 import argparse
 import unittest
-import os
+import subprocess
 from pkg_resources import resource_filename
 
 from glob import glob
@@ -30,6 +31,7 @@ from codeface.logger import set_log_level, start_logfile, log
 from codeface.configuration import Configuration
 from codeface.util import execute_command
 from codeface.project import project_analyse, mailinglist_analyse, sociotechnical_analyse
+import codeface.smart_runner as smart
 
 def get_parser():
     parser = argparse.ArgumentParser(prog='codeface',
@@ -89,6 +91,8 @@ def get_parser():
     ml_parser.add_argument('-m', '--mailinglist', help="Only run on the "
                 "specified mailing list (can be specified multiple times)",
                 default=[], action="append")
+    ml_parser.add_argument('--use-corpus', action="store_true",
+                           help="Re-use the corpus file that have been generated before")
     ml_parser.add_argument('resdir',
                         help="Directory to store analysis results in")
     ml_parser.add_argument('mldir',
@@ -110,8 +114,50 @@ def get_parser():
     dyn_parser.add_argument('graph', help="graph to show", default=None, nargs='?')
     dyn_parser.add_argument('-l', '--list', action="store_true", help="list available graphs")
     dyn_parser.add_argument('-p', '--port', default="8100", help="Pass this to R as port to listen on")
+
+    smart_parser = sub_parser.add_parser('smart',
+                                         description="Start a complete analisys using default "
+                                         "values of known projects. For additional help please see "
+                                         "http://www.google.com/")
+    smart_parser.set_defaults(func=cmd_smart)
+    # ml_parser.add_argument('-c', '--config', help="Codeface configuration file",
+    #             default='codeface.conf')
+    # ml_parser.add_argument('-p', '--project', help="Project configuration file",
+    #             required=True)
+    # ml_parser.add_argument('-m', '--mailinglist', help="Only run on the "
+    #             "specified mailing list (can be specified multiple times)",
+    #             default=[], action="append")
+    # ml_parser.add_argument('resdir',
+    #                     help="Directory to store analysis results in")
+    # ml_parser.add_argument('mldir',
+    #                     help="Directory for mailing lists")
+
     return parser
 
+def cmd_smart(args):
+
+    (cf_conf, prj_args, ml_args,
+     st_args) = smart.prepare_reqs(os.path.basename(os.getcwd()), os.getcwd(), log)
+
+    execute_command(['killall', 'node'], True)
+    id_service = subprocess.Popen(["node", cf_conf.codeface_dir + '/../id_service/id_service.js',
+                                   cf_conf.codeface_conf_file], stdout=subprocess.PIPE)
+
+    if smart.get_status(cf_conf.status_file, smart.PROJECT_ANALIZED) is False:
+        cmd_run(prj_args)
+        smart.set_status_done(cf_conf.status_file, smart.PROJECT_ANALIZED)
+
+    if smart.get_status(cf_conf.status_file, smart.ML_ANALIZED) is False:
+        cmd_ml(ml_args)
+        smart.set_status_done(cf_conf.status_file, smart.ML_ANALIZED)
+
+    if smart.get_status(cf_conf.status_file, smart.SOCIOTECH_ANALIZED) is False:
+        cmd_st(st_args)
+        smart.set_status_done(cf_conf.status_file, smart.SOCIOTECH_ANALIZED)
+
+    id_service.terminate()
+
+    return 0
 
 def cmd_run(args):
     '''Dispatch the ``run`` command.'''
@@ -135,7 +181,8 @@ def cmd_ml(args):
     if logfile:
         logfile = os.path.abspath(logfile)
     mailinglist_analyse(resdir, mldir, codeface_conf, project_conf,
-                        args.loglevel, logfile, args.jobs, args.mailinglist)
+                        args.loglevel, logfile, args.jobs, args.mailinglist,
+                        args.use_corpus)
     return 0
 
 def cmd_st(args):

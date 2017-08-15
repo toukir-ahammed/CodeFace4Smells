@@ -25,40 +25,7 @@ s(library(stringr))
 s(library(optparse))
 rm(s)
 
-## TODO: Are spam messages filtered out by gmail, or are they
-## included in the messages obtained from the server? If the
-## latter is true, we need to include spam.rate in the calculations
-get.postings <- function(ml) {
-  cat("Downloading posts time series for", ml, "...")
-
-  url <- paste("http://gmane.org/output-rate.php?group=", ml, sep="")
-  res = getURL(url)
-  tcon <- textConnection(res)
-  dat <- read.table(tcon, header=TRUE)
-  close(tcon)
-
-  cat("done.\n")
-
-  dat$date <- ymd(as.character(dat$date), quiet=TRUE)
-  dat$posts <- dat$posting.rate + dat$spam.rate
-#  dat$cumulative <- cumsum(dat$posting.rate)
-  dat$cumulative <- cumsum(dat$posts)
-
-  return(dat)
-}
-
-## NOTE NOTE NOTE: The amount of spam to non-spam would also be
-## a good indicator on how well the mailing list is tended.
-
-## Select the number of messages from a given date until today
-num.messages.fromdate <- function(msglist, from.date) {
-  msglist <- msglist[msglist$date >= from.date,]
-  return(max(msglist$cumulative) - min(msglist$cumulative))
-}
-
-download.mbox <- function(ml, start.date, outfile) {
-  dat <- get.postings(ml)
-  num <- num.messages.fromdate(dat, start.date)
+download.mbox <- function(ml, num, outfile) {
 
   ## Execute the command to fetch the messages into an mbox file in
   ## the current directory. Note that this can require a considerable amount
@@ -74,7 +41,7 @@ download.mbox <- function(ml, start.date, outfile) {
 }
 
 #####################################################################
-parser <- OptionParser(usage = "%prog <ml> <start date> <mbox>")
+parser <- OptionParser(usage = "%prog <ml> <num> <mbox>")
 arguments <- parse_args(parser, positional_arguments = TRUE)
 opts <- arguments$options
 
@@ -83,16 +50,21 @@ if (length(arguments$args) != 3) {
 
   cat("Mandatory positional arguments:\n")
   cat("   <ml>: gmane name of the mailing list\n")
-  cat("   <start date>: Date from which onwards to download messages (YYYYMMDD)\n")
+  cat("   <num>: Number of messages to download\n")
   cat("   <mbox>: mbox file name (is augmented with the suffix .mbox)\n")
   stop()
 } else {
   ml <- arguments$args[1]
-  start.date <- ymd(arguments$args[2], quiet=TRUE)
-  outfile <- str_c(arguments$args[3], ".mbox")
+  num <- arguments$args[2]
+
+  if (substr(arguments$args[3], nchar(arguments$args[3])-4, nchar(arguments$args[3])) == ".mbox") {
+    outfile <- arguments$args[3]
+  } else {
+    outfile <- str_c(arguments$args[3], ".mbox")
+  }
 }
 
-download.mbox(ml, start.date, outfile)
+download.mbox(ml, num, outfile)
 
 
 ########################### Debugging ##############################

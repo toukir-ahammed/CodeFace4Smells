@@ -15,6 +15,7 @@
 ## All Rights Reserved.
 
 library(logging)
+library(sna)
 ## Source all r files in a given path
 ## NOTE: This is adapted from the example in the source help page
 source.files <- function(path) {
@@ -148,6 +149,80 @@ store.twomode.graph <- function(con, g, type, ml.id, range.id) {
   }
 }
 
+centrality.edgelist_cf <- 
+function (terms, apply.to, data.path, max.terms=20)
+{
+    if (!(apply.to %in% c("subject", "content")))
+      stop("apply.to must be either 'subject' or 'content'")
+    edgelist <- c()
+    keywords <- new.env()
+    sizes <- rep(0, length(terms))
+
+    for (i in seq_along(terms)) {
+      tmp <- unlist(strsplit(file.path(data.path, "commnet.terms", apply.to,
+                                       paste("net_", terms[i], ".rda", sep = "")),
+                             split = "/"))
+      tmp <- tmp[length(tmp)]
+      filelist <- list.files(file.path(data.path, "commnet.terms", apply.to))
+
+      if (is.element(tmp, filelist)) {
+        load(file.path(data.path, "commnet.terms", apply.to,
+                       paste("net_", terms[i], ".rda", sep = "")))
+
+        net <- sna::component.largest(net, result = "graph",
+                                      connected = "weak")
+        if (!is.null(dim(net))) {
+          sizes[i] <- dim(net)[1]
+        }
+
+        rm(net)
+      }
+    }
+
+    if (max.terms > length(sizes))
+      max.terms <- length(sizes)
+
+    for (i in order(sizes, decreasing=T)[1:max.terms]) {
+      if (sizes[i] == 0)
+        next
+
+      load(file.path(data.path, "commnet.terms", apply.to,
+                     paste("net_", terms[i], ".rda", sep = "")))
+      net <- sna::component.largest(net, result = "graph",
+                                    connected = "weak")
+      authors <- rownames(net)
+
+      # loginfo("--------------------------------- ", logger="ml.ml_utils")
+      # loginfo(paste("net: ", net), logger="ml.ml_utils")
+      # loginfo(paste("authors[1]: ", authors), logger="ml.ml_utils")
+
+      value <- sna::degree(net, cmode = "outdegree")
+      # loginfo(paste("1.value: ",value), logger="ml.ml_utils")
+      value <- cbind(authors, value)
+      # loginfo(paste("2.value: ",value), logger="ml.ml_utils")
+      value <- ordermatrix(value, 1)
+
+      # loginfo(paste("3.value: ",value[, 1]), logger="ml.ml_utils")
+      # loginfo(paste("dim(value): ", dim(value)), logger="ml.ml_utils")
+      # loginfo(paste("dim(value)[1]: ", dim(value)[1]), logger="ml.ml_utils")
+      # loginfo(paste("dim(value)[1] IS NULL: ", is.null(dim(value)[1])), logger="ml.ml_utils")
+
+      if (is.null(dim(value)[1]) == TRUE) {
+        value <- cbind(value, seq(1:length(value))/length(value))
+      } else {
+        value <- cbind(value[, 1], seq(1:dim(value)[1])/dim(value)[1])
+      }
+      edgelist <- rbind(edgelist, cbind(value[, 1], terms[i], value[, 2]))
+    }
+
+    ## Provide textual indices
+    ## edgelist[,1] = author
+    ## edgelist[,2] = term
+    ## edgelist[,3] = outdegree
+    dimnames(edgelist) <- list(NULL, c("author", "term", "outdegree"))
+    return (list(edgelist=edgelist, sizes=sizes))
+}
+
 ## TODO: Do something with the sizes output of edgelist (which describes the weight
 ## of each keyword), for instance visualise the distribution as a sanity indicator
 gen.net <- function(type, termfreq, data.path, max.terms) {
@@ -155,7 +230,7 @@ gen.net <- function(type, termfreq, data.path, max.terms) {
     stop ("Internal error: Unsupported type for gen.net!")
   }
 
-  res <- centrality.edgelist(termfreq, type, data.path, max.terms)
+  res <- centrality.edgelist_cf(termfreq, type, data.path, max.terms)
   adj.matrix <- adjacency(res$edgelist, mode="addvalues", directed=FALSE)
 
 #  print(ggplot(data.frame(x=res[[2]]), aes(x=x)) + geom_histogram(binwidth=1))
@@ -290,7 +365,19 @@ gen.combined.network <- function(interest.network, commnet) {
 
   ## Permute the communication network such that the order
   ## of elements is identical to the interest network
-  network.red <- permutation(network.red, rownames(interestnet))
+
+  # loginfo(paste("interestnet: ", interestnet), logger="ml.ml_utils")
+  # loginfo(paste("rownames(interestnet): ", rownames(interestnet, do.NULL=FALSE, prefix="NA.")), logger="ml.ml_utils")
+
+  # loginfo(paste("interestnet IS NULL: ", is.null(rownames(interestnet, do.NULL=FALSE, prefix="NA."))),
+  #   logger="ml.ml_utils")
+
+  # loginfo(paste("network.red IS NULL: ", is.null(dim(network.red))), logger="ml.ml_utils")
+  # loginfo(paste("rownames(network.red): ", rownames(network.red)), logger="ml.ml_utils")
+
+  if (is.null(dim(network.red)) == FALSE) {
+    network.red <- permutation(network.red, rownames(interestnet, do.NULL=FALSE, prefix="NA."))
+  }
 
   ## TODO: Why are different packages used to compute the graph measures?
   ## They should all be supported by SNA
@@ -339,7 +426,7 @@ compute.initiate.respond <- function(forest, network.red, cty.list) {
 
   ## TODO: Why does snatm want to construct an outlier here?!
 ##  cent[dim(cent)[1],] <- c(max(cent[,1])+40, max(cent[,2])+100, 0)
-  cent$deg <- normalize(cent$deg)
+  cent$deg <- snatm::normalize(cent$deg)
   cent$col[cent$deg > DEG.THRESHOLD] <- "High deg"
 
   return(cent)

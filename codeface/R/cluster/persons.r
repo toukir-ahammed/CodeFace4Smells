@@ -672,7 +672,13 @@ save.group <- function(conf, .tags, .iddb, idx, .prank, .filename=NULL, label) {
   ## otherwise (not sure what the actual issue is)
   ## NOTE: V(g)$name as label index does NOT work because the name attribute
   ## is _not_ stable.
-  V(g)$label <- as.character(IDs.to.names(.iddb, idx))
+  names.from.ids <- as.character(IDs.to.names(.iddb, idx))
+  # if (nchar(names.from.ids) <= 18) {
+    # V(g)$label <- names.from.ids
+  # } else {
+    V(g)$label <- sapply(names.from.ids, function(x) substring(x, 1, 18))
+  # }
+
 
   ## We also use the page rank to specify the font size of the vertex
   V(g)$fontsize <- scale.data(.prank$vector, 15, 50)[idx]

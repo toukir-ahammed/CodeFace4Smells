@@ -971,11 +971,14 @@ CREATE TABLE IF NOT EXISTS `codeface`.`mail` (
   `author` BIGINT NOT NULL,
   `subject` VARCHAR(255) NULL DEFAULT NULL,
   `creationDate` DATETIME NOT NULL,
+  `creationDateOffset` INT(11) NOT NULL COMMENT '',
+  `messageId` VARCHAR(255) NOT NULL COMMENT '',
   PRIMARY KEY (`id`),
   INDEX `mail_author_idx` (`author` ASC),
   INDEX `mail_projectId_idx` (`projectId` ASC),
   INDEX `mail_mlId_idx` (`mlId` ASC),
   INDEX `mail_comp1_idx` (`mlId` ASC, `projectId` ASC, `creationDate` ASC),
+  INDEX `mail_messageId_idx` (`messageId` ASC),
   CONSTRAINT `mail_author`
     FOREIGN KEY (`author`)
     REFERENCES `codeface`.`person` (`id`)

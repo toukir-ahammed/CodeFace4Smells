@@ -50,6 +50,9 @@ if(length(p) > 0) {
 }
 
 
+slam_url <- "https://cran.r-project.org/src/contrib/Archive/slam/slam_0.1-37.tar.gz"
+devtools::install_url(slam_url)
+
 ## Install following packages from different sources
 ## and update existing installations, if needed
 reinstall.package.from.github("tm.plugin.mail", "wolfgangmauerer/tm-plugin-mail/pkg")

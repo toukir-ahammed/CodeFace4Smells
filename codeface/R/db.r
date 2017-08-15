@@ -19,6 +19,7 @@
 
 ## TODO: Add S3 database helper class similar to dbManager.py
 
+##suppressPackageStartupMessages(library(DBI))
 suppressPackageStartupMessages(library(RMySQL))
 suppressPackageStartupMessages(library(stringr))
 suppressPackageStartupMessages(library(lubridate))
@@ -57,8 +58,15 @@ get.clear.plot.id.con <- function(con, pid, plot.name, range.id=NULL,
                    labely=sq(labely))
   values <- paste(insert.data, collapse=", ")
   columns <-  paste(names(insert.data), collapse=", ")
+  
   insert.query <- str_c("INSERT INTO plots (", columns, ") ",
                         "VALUES (", values, ")")
+
+  print("----------------------------------------------------------------------------")
+  print(insert.query)
+  print(paste("plot name:", sq(plot.name)))
+  print("----------------------------------------------------------------------------")
+
   dbGetQuery(con, insert.query)
 
   res <- dbGetQuery(con, str_c("SELECT id", query))
