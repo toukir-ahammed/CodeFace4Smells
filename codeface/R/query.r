@@ -739,3 +739,20 @@ table.has.entries <- function(conf, table) {
 
   return (dim(dat)[1] > 0)
 }
+
+write.sociotechnical.db <- function(data,conf) {
+  
+  # Get all release for this project
+  release_range.ids = get.cycles(conf)[, c("range.id", "cycle")]
+  # Merge sociotechnical data with db data
+  final.data <- merge(release_range.ids,data,by.x="cycle",by.y="range")
+  # Get rid of useless columns
+  final.data[c("cycle","range.date")] <- list(NULL)
+  # Prepare data to save
+  colnames(final.data)[colnames(final.data)=="range.id"] <- "releaseRangeID"
+  # Delete possible old data
+  ids.to.delete <- paste(final.data[,"releaseRangeID"], collapse=",")
+  dbGetQuery(conf$con, paste("DELETE FROM sociotechnical WHERE releaseRangeID in (", ids.to.delete, ")"))
+  # Save data back to the db
+  dbWriteTable(conf$con, "sociotechnical", final.data, append=TRUE, row.names=FALSE)
+}

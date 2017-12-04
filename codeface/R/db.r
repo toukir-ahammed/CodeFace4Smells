@@ -62,11 +62,6 @@ get.clear.plot.id.con <- function(con, pid, plot.name, range.id=NULL,
   insert.query <- str_c("INSERT INTO plots (", columns, ") ",
                         "VALUES (", values, ")")
 
-  print("----------------------------------------------------------------------------")
-  print(insert.query)
-  print(paste("plot name:", sq(plot.name)))
-  print("----------------------------------------------------------------------------")
-
   dbGetQuery(con, insert.query)
 
   res <- dbGetQuery(con, str_c("SELECT id", query))

@@ -1005,13 +1005,15 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
                              "st.congruence", "communicability", "global.turnover", "code.turnover",
                              "core.global.turnover", "core.mail.turnover", "core.code.turnover", 
                              "ratio.smelly.quitters", "ratio.smelly.devs", "global.truck", "mail.truck", "code.truck",
-                             "closeness.centr", "betweenness.centr", "degree centr", 
+                             "closeness.centr", "betweenness.centr", "degree.centr", 
                              "global.mod", "mail.mod", "code.mod", "density",
                              "mail.only.core.devs", "code.only.core.devs", "ml.code.core.devs", 
                              "ratio.mail.only.core", "ratio.code.only.core", "ratio.ml.code.core")
   write.csv(report.data, file=file.path(sociotechdir, "report.csv"), row.names=FALSE)
+  
+  loginfo("Saving data ")
+  write.sociotechnical.db(report.data, conf)
 }
-
 
 ######################### Dispatcher ###################################
 config.script.run({

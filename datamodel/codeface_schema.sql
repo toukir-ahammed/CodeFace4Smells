@@ -996,6 +996,66 @@ CREATE TABLE IF NOT EXISTS `codeface`.`mail` (
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `codeface`.`sociotechnical`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `codeface`.`sociotechnical` ;
+
+CREATE TABLE IF NOT EXISTS `codeface`.`sociotechnical` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `releaseRangeId` BIGINT NOT NULL,
+  `devs` INT NOT NULL DEFAULT 0,
+  `ml_only_devs` INT NOT NULL DEFAULT 0,
+  `code_only_devs` INT NOT NULL DEFAULT 0,
+  `ml_code_devs` INT NOT NULL DEFAULT 0,
+  `perc_ml_only_devs` FLOAT NOT NULL DEFAULT 0,
+  `perc_code_only_devs` FLOAT NOT NULL DEFAULT 0,
+  `perc_ml_code_devs` FLOAT NOT NULL DEFAULT 0,
+  `sponsored_devs` INT NOT NULL DEFAULT 0,
+  `ratio_sponsored` FLOAT NOT NULL DEFAULT 0,
+  `sponsored_core_devs` INT NOT NULL DEFAULT 0,
+  `ratio_sponsored_core` FLOAT NOT NULL DEFAULT 0,
+  `num_tz` INT NOT NULL DEFAULT 0,
+  `core_global_devs` INT NOT NULL DEFAULT 0,
+  `core_mail_devs` INT NOT NULL DEFAULT 0,
+  `core_code_devs` INT NOT NULL DEFAULT 0,
+  `org_silo` INT NOT NULL DEFAULT 0,
+  `prima_donnas` INT NOT NULL DEFAULT 0,
+  `radio_silence` INT NOT NULL DEFAULT 0,
+  `black_cloud` INT NOT NULL DEFAULT 0,
+  `missing_links` INT NOT NULL DEFAULT 0,
+  `st_congruence` FLOAT NOT NULL DEFAULT 0,
+  `communicability` FLOAT NOT NULL DEFAULT 0,
+  `global_turnover` FLOAT NOT NULL DEFAULT 0,
+  `code_turnover` FLOAT NOT NULL DEFAULT 0,
+  `core_global_turnover` FLOAT NOT NULL DEFAULT 0,
+  `core_mail_turnover` FLOAT NOT NULL DEFAULT 0,
+  `core_code_turnover` FLOAT NOT NULL DEFAULT 0,
+  `ratio_smelly_quitters` FLOAT NOT NULL DEFAULT 0,
+  `ratio_smelly_devs` FLOAT NOT NULL DEFAULT 0,
+  `global_truck` FLOAT NOT NULL DEFAULT 0,
+  `mail_truck` FLOAT NOT NULL DEFAULT 0,
+  `code_truck` FLOAT NOT NULL DEFAULT 0,
+  `closeness_centr` FLOAT NOT NULL DEFAULT 0,
+  `betweenness_centr` FLOAT NOT NULL DEFAULT 0,
+  `degree_centr` FLOAT NOT NULL DEFAULT 0,
+  `global_mod` FLOAT NOT NULL DEFAULT 0,
+  `mail_mod` FLOAT NOT NULL DEFAULT 0,
+  `code_mod` FLOAT NOT NULL DEFAULT 0,
+  `density` FLOAT NOT NULL DEFAULT 0,
+  `mail_only_core_devs` INT NOT NULL DEFAULT 0,
+  `code_only_core_devs` INT NOT NULL DEFAULT 0,
+  `ml_code_core_devs` INT NOT NULL DEFAULT 0,
+  `ratio_mail_only_core` FLOAT NOT NULL DEFAULT 0,
+  `ratio_code_only_core` FLOAT NOT NULL DEFAULT 0,
+  `ratio_ml_code_core` FLOAT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `sociotechnical_releaseRangeId_ref`
+    FOREIGN KEY (`releaseRangeId`)
+    REFERENCES `codeface`.`release_range` (`id`))
+ENGINE = InnoDB;
+
 USE `codeface` ;
 
 -- -----------------------------------------------------
