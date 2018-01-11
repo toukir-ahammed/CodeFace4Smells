@@ -1056,6 +1056,43 @@ CREATE TABLE IF NOT EXISTS `codeface`.`sociotechnical` (
     REFERENCES `codeface`.`release_range` (`id`))
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `codeface`.`sociotechnical_smells`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `codeface`.`sociotechnical_smells`;
+
+CREATE TABLE IF NOT EXISTS `codeface`.`sociotechnical_smells` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+INSERT INTO `codeface`.`sociotechnical_smells` (`name`) VALUES ('org.silo'),('radiosilence'),('black.cloud'),('primadonnas'),('missing.links');
+
+-- -----------------------------------------------------
+-- Table `codeface`.`sociotechnical_granular`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `codeface`.`sociotechnical_granular`;
+
+CREATE TABLE IF NOT EXISTS `codeface`.`sociotechnical_granular` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `releaseRangeId` BIGINT NOT NULL,
+  `socioTechnicalSmellId` BIGINT NOT NULL,
+  `personId` BIGINT NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `sociotechnical_granular_releaseRangeId_ref`
+    FOREIGN KEY (`releaseRangeId`)
+    REFERENCES `codeface`.`release_range` (`id`),
+  CONSTRAINT `sociotechnical_granular_socioTechnicalSmellId_ref`
+    FOREIGN KEY (`socioTechnicalSmellId`)
+    REFERENCES `codeface`.`sociotechnical_smells` (`id`),
+  CONSTRAINT `sociotechnical_granular_personId_ref`
+    FOREIGN KEY (`personId`)
+    REFERENCES `codeface`.`person` (`id`))
+ENGINE = InnoDB;
+
+
+
 USE `codeface` ;
 
 -- -----------------------------------------------------

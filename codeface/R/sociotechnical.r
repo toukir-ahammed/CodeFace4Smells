@@ -137,7 +137,7 @@ community.smell.organisational.silo <- function (mail.graph, code.graph) {
       silos[[length(silos) + 1]] <- c(vert, collab)
     }
   }
-  
+
   return(silos)
 }
 
@@ -302,7 +302,7 @@ community.smell.radio.silence <- function (mail.graph, clusters) {
       }
     }
   }
-  
+
   return(unique(brockers))
 }
 
@@ -352,6 +352,33 @@ community.metric.mean.communicability <- function (mail.graph, code.graph) {
   }
   
   return(1-mean(mai))
+}
+
+
+##################################### GRANULAR DATA #########################################
+
+collect.granular.smell.data <- function(existing.data, range, smell, dev) {
+
+  if (length(dev) > 0 ) {
+    
+    dev.filtered = as.numeric(dev)
+    dev.filtered = dev.filtered[!is.na(dev.filtered)]
+    
+    if (length(dev.filtered) > 0 ) {
+      new.data <- data.frame(range, smell, dev.filtered)
+      names(new.data) <- c("range", "smell", "dev")
+      
+      existing.data <- rbind(existing.data, new.data)
+      names(existing.data) <- c("range", "smell", "dev")
+    }
+  }
+  
+  return(existing.data)
+}
+
+get.smell.by.name <- function(smells.list, smell.name) {
+
+  return(smells.list[smells.list$name == smell.name,]$id)
 }
 
 
@@ -654,6 +681,12 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
   bound <- conf$boundaries
   ranges <- bound$cycle
   
+  ## retrieve sociotechnical smells list
+  sociotechnical.smells <- query.sociotechnical.smells(conf)
+
+  ## prepare to collect granular smell data
+  granular.smell.data <- data.frame()
+
   ## list of previous range data needed by the next range analysis
   prev.range.potential.black.cloud <- c()
   prev.all.devs.ids <- c()
@@ -719,10 +752,29 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
     global.clusters <- walktrap.community(global.graph, weights=E(global.graph)$weight)
     
     ## Check community smells
+    ## Organizational Silo
     smell.org.silo <- community.smell.organisational.silo(mail.graph, code.graph)
     all.smell.org.silo[range] <- length(smell.org.silo)
+    if (all.smell.org.silo[range] > 0) {
+      granular.smell.data <- collect.granular.smell.data(
+                                granular.smell.data, 
+                                ranges[range], 
+                                get.smell.by.name(sociotechnical.smells, "org.silo"), 
+                                unique(unlist(smell.org.silo)[c(T, F)]) # Get each first elem only                              
+                              )
+    }
+    ## Radio Silence
     smell.radiosilence <- community.smell.radio.silence(mail.graph, mail.clusters)
     all.smell.radiosilence[range] <- length(smell.radiosilence)
+    if (all.smell.radiosilence[range] > 0) {
+      granular.smell.data <- collect.granular.smell.data(
+                                granular.smell.data, 
+                                ranges[range], 
+                                get.smell.by.name(sociotechnical.smells, "radiosilence"), 
+                                unique(unlist(smell.radiosilence))
+                              )
+    }
+    ## Black Cloud
     ## Black cloud smell should be iterated over time (present in the previous range)
     ## we need to change format to allow the instersection operation
     smell.potential.black.cloud.orig <- community.smell.potential.black.cloud(mail.graph, mail.clusters)
@@ -736,6 +788,15 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
     smell.black.cloud <- intersect(smell.potential.black.cloud, prev.range.potential.black.cloud)
     prev.range.potential.black.cloud <- smell.potential.black.cloud
     all.smell.blackcloud[range] <- length(smell.black.cloud)
+    if (all.smell.blackcloud[range] > 0) {
+      granular.smell.data <- collect.granular.smell.data(
+                                granular.smell.data, 
+                                ranges[range], 
+                                get.smell.by.name(sociotechnical.smells, "black.cloud"), 
+                                unique(unlist(smell.black.cloud))
+                              )
+    }
+    ## Prima-donna
     ## Reuse black cloud computation to compute prima-donnas. Prima-donnas can exist only when
     ## a black cloud exists
     smell.primadonnas <- c()
@@ -744,10 +805,27 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
         community.smell.primadonnas(mail.graph, mail.clusters, code.graph, 
                                     precomputed.black=smell.potential.black.cloud.orig)
     } 
-    all.smell.primadonnas[range] <- length(unique(unlist(smell.primadonnas)))  
+    all.smell.primadonnas[range] <- length(unique(unlist(smell.primadonnas))) 
+    if (all.smell.primadonnas[range] > 0) { 
+      granular.smell.data <- collect.granular.smell.data(
+                                granular.smell.data, 
+                                ranges[range], 
+                                get.smell.by.name(sociotechnical.smells, "primadonnas"), 
+                                unique(unlist(smell.primadonnas))
+                              )
+    }
+    ## Missing links
     smell.missing.links <- community.smell.missing.links(mail.graph, code.graph,
                                                          precomputed.silo=smell.org.silo)
     all.smell.missing[range] <- length(smell.missing.links)
+    if (all.smell.missing[range] > 0) {
+      granular.smell.data <- collect.granular.smell.data(
+                                granular.smell.data, 
+                                ranges[range], 
+                                get.smell.by.name(sociotechnical.smells, "missing.links"), 
+                                unique(unlist(smell.missing.links))
+                              )
+    }
 
         
     ## Compute socio-technical metrics
@@ -1013,6 +1091,7 @@ sociotechnical.analysis <- function (sociotechdir, codedir, conf) {
   
   loginfo("Saving data ")
   write.sociotechnical.db(report.data, conf)
+  write.sociotechnical.granular.smell.db(granular.smell.data, conf)
 }
 
 ######################### Dispatcher ###################################
