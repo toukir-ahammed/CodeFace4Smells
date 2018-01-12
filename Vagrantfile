@@ -23,25 +23,29 @@ Vagrant.configure("2") do |config|
   # Ubuntu 12.04 LTS (Precise Pangolin)
 
  config.vm.provider :virtualbox do |vbox, override|
-    override.vm.box = "precise64"
-    override.vm.box_url = "http://files.vagrantup.com/precise64.box"
-
+    #override.vm.box = "trusty64"
+    #override.vm.box_url = "http://files.vagrantup.com/trusty64.box"
+    config.vm.box = "ubuntu/trusty64"
     vbox.customize ["modifyvm", :id, "--memory", "4096"]
     vbox.customize ["modifyvm", :id, "--cpus", "2"]
   end
 
   config.vm.provider :lxc do |lxc, override|
-     override.vm.box = "fgrehm/precise64-lxc"
+     override.vm.box = "fgrehm/trusty64-lxc"
   end
 
   # Forward main web ui (8081) and testing (8100) ports
   config.vm.network :forwarded_port, guest: 8081, host: 8081
   config.vm.network :forwarded_port, guest: 8100, host: 8100
-  config.vm.network "forwarded_port", guest: 3306, host: 33060
 
   config.vm.provision "fix-no-tty", type: "shell" do |s|
     s.privileged = true
     s.inline = "sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile"
+  end
+
+  config.vm.provision "local-mirror", type: "shell" do |s|
+    s.privileged = true
+    s.inline = "sed -i 's|http://[a-z\.]*\.ubuntu\.com/ubuntu|mirror://mirrors\.ubuntu\.com/mirrors\.txt|' /etc/apt/sources.list"
   end
 
   config.vm.provision "build", type: "shell" do |s|
