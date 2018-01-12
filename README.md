@@ -25,10 +25,21 @@ To get a `codeface` executable in your `$PATH`; go to `$CFDIR` and run:
 
 To analyse a project:
 
-* Clone the desired git repositories into some directory
+* Clone the desired git repositories into some directory, e.g,
+
+	```
+mkdir ~/git-repos;
+cd ~/git-repos
+git clone https://github.com/apache/allura.git
+ ```
+
 * Download the desired mailing lists into some directory
+* Create a folder to store results, e.g., `mkdir ~/results`
 * Start the ID server: `cd $CFDIR/id_service/; nodejs id_service.js ../codeface.conf`
-* Run `codeface`, see the command line help for usage examples
+* Navigate to the `vagrant` folder in the `root` directory: `cd /vagrant/`
+* Run `codeface`, indicating the configuration files and source folders, e.g.,
+`codeface run -c codeface.conf -p conf/allura.conf ~/results/ ~/git-repos/`
+* See `codeface -h` or `codeface [command] -h` for command line help and usage example
 
 ## Web server setup
 There are two options to set up an instance of the web frontend server:
