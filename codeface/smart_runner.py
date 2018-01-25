@@ -22,11 +22,13 @@ ML_DOWNLOADED = "mlDownloaded"
 PROJECT_ANALIZED = "projectAnalized"
 ML_ANALIZED = "mlAnalized"
 SOCIOTECH_ANALIZED = "sociotechAnalized"
+TECHSMELL_ANALIZED = "techsmellAnalized"
 
 def get_status(status_file, key):
     with open(status_file) as sfile:
         status = json.load(sfile)
-    return status[key]
+
+    return status.get(key, False)
 
 def _set_status(status_file, key, new_status):
     with open(status_file) as sfile:
@@ -63,7 +65,8 @@ def _init(project_name, project_dir):
                 ML_DOWNLOADED: False,
                 PROJECT_ANALIZED: False,
                 ML_ANALIZED: False,
-                SOCIOTECH_ANALIZED: False
+                SOCIOTECH_ANALIZED: False,
+                TECHSMELL_ANALIZED: False
                 }, outfile)
 
     return (codeface_dir, codeface_conf_file, codeface_base_conf, project_conf_file,
@@ -142,7 +145,16 @@ def prepare_reqs(project_name, project_dir, console):
     setattr(st_args, 'logfile', None)
     setattr(st_args, 'jobs', cores)
 
-    return cf_conf, prj_args, ml_args, st_args
+    tsa_args = Namespace()
+    setattr(tsa_args, 'resdir', project_results_dir)
+    setattr(tsa_args, 'gitdir', repo_folder)
+    setattr(tsa_args, 'config', codeface_conf_file)
+    setattr(tsa_args, 'project', project_conf_file)
+    setattr(tsa_args, 'loglevel', 'info')
+    setattr(tsa_args, 'logfile', None)
+    setattr(tsa_args, 'jobs', cores)
+
+    return cf_conf, prj_args, ml_args, st_args, tsa_args
 
 
 

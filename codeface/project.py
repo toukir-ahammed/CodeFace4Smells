@@ -16,14 +16,17 @@
 
 from logging import getLogger; log = getLogger(__name__)
 from pkg_resources import resource_filename
-from os.path import join as pathjoin, split as pathsplit, abspath
+from os.path import join as pathjoin, split as pathsplit, abspath, exists as pathexists
+from os import makedirs, error as os_error
 
 from .dbmanager import DBManager
 from .configuration import Configuration, ConfigurationError
 from .cluster.cluster import doProjectAnalysis, LinkType
 from .ts import dispatch_ts_analysis
 from .util import (execute_command, generate_reports, layout_graph,
-                   check4ctags, check4cppstats, BatchJobPool, generate_analysis_windows, generate_report_st)
+                   check4ctags, check4cppstats, BatchJobPool, generate_analysis_windows,
+                   generate_report_st)
+from .tech_smell import doTechSmellAnalysis
 
 def loginfo(msg):
     ''' Pickleable function for multiprocessing '''
@@ -261,8 +264,45 @@ def sociotechnical_analyse(resdir, codeface_conf, project_conf, loglevel,
     cmd.extend(("-p", project_conf))
     cmd.extend(("-j", str(n_jobs)))
     cmd.append(project_resdir)
-    
+
     log.info("=> Performing socio-technical analysis")
     execute_command(cmd, direct_io=True, cwd=cwd)
     generate_report_st(pathjoin(resdir, conf["project"], "st"))
     log.info("=> Codeface socio-technical analysis complete!")
+
+def techsmell_analyse(resdir, gitdir, tsadir, codeface_conf, project_conf,
+                      loglevel, logfile, n_jobs):
+    conf = Configuration.load(codeface_conf, project_conf)
+    project_resdir = pathjoin(resdir, conf["project"], "techsmell")
+
+    #-----------------------------
+    # folder setup
+    #-----------------------------
+    if not pathexists(project_resdir):
+        try:
+            makedirs(project_resdir)
+        except os_error as e:
+            log.exception("Could not create output dir {0}: {1}".
+                          format(project_resdir, e.strerror))
+            raise
+
+    log.info("=> Performing tech smell analysis")
+    #-----------------------------
+    # tech smell csv
+    #-----------------------------
+    doTechSmellAnalysis(conf, project_resdir, gitdir, tsadir)
+
+
+    # exe = abspath(resource_filename(__name__, "R/techsmell.r"))
+    # cwd, _ = pathsplit(exe)
+    # cmd = [exe]
+    # if logfile:
+    #     cmd.extend(("--logfile", "{}.R.techsmell".format(logfile)))
+    # cmd.extend(("--loglevel", loglevel))
+    # cmd.extend(("-c", codeface_conf))
+    # cmd.extend(("-p", project_conf))
+    # cmd.extend(("-j", str(n_jobs)))
+    # cmd.append(project_resdir)
+    # execute_command(cmd, direct_io=True, cwd=cwd)
+
+    log.info("=> Codeface tech smell analysis complete!")

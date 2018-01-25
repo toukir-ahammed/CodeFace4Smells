@@ -30,7 +30,8 @@ from glob import glob
 from codeface.logger import set_log_level, start_logfile, log
 from codeface.configuration import Configuration
 from codeface.util import execute_command
-from codeface.project import project_analyse, mailinglist_analyse, sociotechnical_analyse
+from codeface.project import (project_analyse, mailinglist_analyse, sociotechnical_analyse,
+                              techsmell_analyse)
 import codeface.smart_runner as smart
 
 def get_parser():
@@ -120,24 +121,21 @@ def get_parser():
                                          "values of known projects. For additional help please see "
                                          "http://www.google.com/")
     smart_parser.set_defaults(func=cmd_smart)
-    # ml_parser.add_argument('-c', '--config', help="Codeface configuration file",
-    #             default='codeface.conf')
-    # ml_parser.add_argument('-p', '--project', help="Project configuration file",
-    #             required=True)
-    # ml_parser.add_argument('-m', '--mailinglist', help="Only run on the "
-    #             "specified mailing list (can be specified multiple times)",
-    #             default=[], action="append")
-    # ml_parser.add_argument('resdir',
-    #                     help="Directory to store analysis results in")
-    # ml_parser.add_argument('mldir',
-    #                     help="Directory for mailing lists")
+
+    tsa_parser = sub_parser.add_parser('tsa', description="Start tech smell analysis")
+    tsa_parser.set_defaults(func=cmd_tsa)
+    tsa_parser.add_argument('resdir', help="Directory to store analysis results in")
+    tsa_parser.add_argument('gitdir', help="Directory for git repositories")
+    tsa_parser.add_argument('-c', '--config', help="Codeface configuration file",
+                            default='codeface.conf')
+    tsa_parser.add_argument('-p', '--project', help="Project configuration file", required=True)
 
     return parser
 
 def cmd_smart(args):
 
-    (cf_conf, prj_args, ml_args,
-     st_args) = smart.prepare_reqs(os.path.basename(os.getcwd()), os.getcwd(), log)
+    (cf_conf, prj_args, ml_args, st_args,
+     tsa_args) = smart.prepare_reqs(os.path.basename(os.getcwd()), os.getcwd(), log)
 
     execute_command(['killall', 'node'], True)
     id_service = subprocess.Popen(["node", cf_conf.codeface_dir + '/../id_service/id_service.js',
@@ -154,6 +152,10 @@ def cmd_smart(args):
     if smart.get_status(cf_conf.status_file, smart.SOCIOTECH_ANALIZED) is False:
         cmd_st(st_args)
         smart.set_status_done(cf_conf.status_file, smart.SOCIOTECH_ANALIZED)
+
+    if smart.get_status(cf_conf.status_file, smart.TECHSMELL_ANALIZED) is False:
+        cmd_tsa(tsa_args)
+        smart.set_status_done(cf_conf.status_file, smart.TECHSMELL_ANALIZED)
 
     id_service.terminate()
 
@@ -195,6 +197,20 @@ def cmd_st(args):
         logfile = os.path.abspath(logfile)
     sociotechnical_analyse(resdir, codeface_conf, project_conf,
                            args.loglevel, logfile, args.jobs)
+    return 0
+
+def cmd_tsa(args):
+    '''Dispatch the ``tsa`` command.'''
+
+    tsa_dir = os.path.dirname(os.path.abspath(__file__)) + '/../tsa'
+    # First make all the args absolute
+    resdir, gitdir, tsadir = map(os.path.abspath, (args.resdir, args.gitdir, tsa_dir))
+    codeface_conf, project_conf = map(os.path.abspath, (args.config, args.project))
+    logfile = args.logfile
+    if logfile:
+        logfile = os.path.abspath(logfile)
+    techsmell_analyse(resdir, gitdir, tsadir, codeface_conf, project_conf, args.loglevel,
+                      logfile, args.jobs)
     return 0
 
 def cmd_dynamic(args):

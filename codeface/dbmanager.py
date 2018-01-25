@@ -211,6 +211,18 @@ class DBManager:
             raise Exception("Range id {} not found!".format(project_id))
         return ranges[0]
 
+    def get_project_release_end(self, pid):
+        self.doExec(
+            "SELECT release_range.id, release_timeline.tag "
+            "FROM release_range "
+            "INNER JOIN release_timeline ON release_range.releaseEndId = release_timeline.id "
+            "WHERE release_range.projectId=%s "
+            "ORDER BY release_timeline.date ",
+            (pid,))
+        if self.cur.rowcount == 0:
+            raise Exception("No release for project {} found!".format(pid))
+        return(self.doFetchAll())
+
     def update_release_timeline(self, project, tagging, revs, rcs,
             recreate_project=False):
         '''
