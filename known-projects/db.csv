@@ -81,3 +81,4 @@ ember.js,https://www.emberjs.com/,https://github.com/emberjs/ember.js.git,
 yii,http://www.yiiframework.com/,https://github.com/yiisoft/yii.git,
 mongoid,http://mongoid.org/,https://github.com/mongodb/mongoid.git,
 bootstrap,http://getbootstrap.com/,https://github.com/twbs/bootstrap.git,
+AMQ,http://activemq.apache.org/,https://github.com/apache/activemq.git,gmane.comp.java.activemq.devel
