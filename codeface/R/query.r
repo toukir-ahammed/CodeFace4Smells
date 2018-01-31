@@ -781,3 +781,49 @@ write.sociotechnical.granular.smell.db <- function(data, conf) {
   # Save data back to the db
   dbWriteTable(conf$con, "sociotechnical_granular", final.data, append=TRUE, row.names=FALSE)
 }
+
+write.techsmell.db <- function(data, conf) {
+
+  # Prepare data to save
+  colnames(data)[colnames(data) == "range.id"] <- "releaseRangeID"
+
+  # Delete possible old data
+  ids.to.delete <- paste(data[,"releaseRangeID"], collapse=",")
+  dbGetQuery(conf$con, paste("DELETE FROM techsmell WHERE releaseRangeID in (", ids.to.delete, ")"))
+  # Save data back to the db
+  dbWriteTable(conf$con, "techsmell", data, append=TRUE, row.names=FALSE)
+}
+
+write.tech.and.community.smell.db <- function(data, conf) {
+
+  # Data to save
+  ids.to.save <- paste(data, collapse=",")
+  # Delete possible old data
+  dbGetQuery(conf$con, paste("DELETE FROM tech_and_community_smells WHERE releaseRangeID in (", ids.to.save, ")"))
+  # Save data back to the db
+  dbGetQuery(conf$con, paste(
+    "INSERT INTO tech_and_community_smells ",
+    "(releaseRangeId, tag, authorId, socioTechnicalSmellId, smellName, file, ",
+    "classDataShouldBePrivate, complexClass, functionalDecomposition, godClass, ",
+    "spaghettiCode, hasLongMethods) ",
+    "SELECT releaseRangeId, tag, authorId, socioTechnicalSmellId, smellName, file, ",
+    "classDataShouldBePrivate, complexClass, functionalDecomposition, godClass, ",
+    "spaghettiCode, hasLongMethods ",
+    "FROM tech_and_community_smells_view ",
+    "WHERE releaseRangeID in (", ids.to.save, ")"
+  ))
+}
+
+get.tech.and.community.smell.db <- function(data, conf) {
+
+  # Data to get
+  ids.to.get <- paste(data, collapse=",")
+  res <- dbGetQuery(conf$con, paste(
+          "SELECT tag, authorId, smellName, file, ",
+          "classDataShouldBePrivate, complexClass, functionalDecomposition, godClass, ",
+          "spaghettiCode, hasLongMethods ",
+          "FROM tech_and_community_smells ",
+          "WHERE releaseRangeID in (", ids.to.get, ")"
+        ))
+  return(res)
+}

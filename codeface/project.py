@@ -15,6 +15,7 @@
 # All Rights Reserved.
 
 from logging import getLogger; log = getLogger(__name__)
+from progressbar import ProgressBar, Percentage, Bar
 from pkg_resources import resource_filename
 from os.path import join as pathjoin, split as pathsplit, abspath, exists as pathexists
 from os import makedirs, error as os_error
@@ -292,17 +293,21 @@ def techsmell_analyse(resdir, gitdir, tsadir, codeface_conf, project_conf,
     #-----------------------------
     doTechSmellAnalysis(conf, project_resdir, gitdir, tsadir)
 
+    widgets = ['Pass 2/2: ', Percentage(), ' ', Bar()]
+    pbar = ProgressBar(widgets=widgets).start()
 
-    # exe = abspath(resource_filename(__name__, "R/techsmell.r"))
-    # cwd, _ = pathsplit(exe)
-    # cmd = [exe]
-    # if logfile:
-    #     cmd.extend(("--logfile", "{}.R.techsmell".format(logfile)))
-    # cmd.extend(("--loglevel", loglevel))
-    # cmd.extend(("-c", codeface_conf))
-    # cmd.extend(("-p", project_conf))
-    # cmd.extend(("-j", str(n_jobs)))
-    # cmd.append(project_resdir)
-    # execute_command(cmd, direct_io=True, cwd=cwd)
+    exe = abspath(resource_filename(__name__, "R/techsmell.r"))
+    cwd, _ = pathsplit(exe)
+    cmd = [exe]
+    if logfile:
+        cmd.extend(("--logfile", "{}.R.techsmell".format(logfile)))
+    cmd.extend(("--loglevel", loglevel))
+    cmd.extend(("-c", codeface_conf))
+    cmd.extend(("-p", project_conf))
+    cmd.extend(("-j", str(n_jobs)))
+    cmd.append(project_resdir)
+    execute_command(cmd, direct_io=True, cwd=cwd)
+
+    pbar.finish()
 
     log.info("=> Codeface tech smell analysis complete!")

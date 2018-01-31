@@ -1091,6 +1091,59 @@ CREATE TABLE IF NOT EXISTS `codeface`.`sociotechnical_granular` (
     REFERENCES `codeface`.`person` (`id`))
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `codeface`.`techsmell`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `codeface`.`techsmell`;
+
+CREATE TABLE IF NOT EXISTS `codeface`.`techsmell` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `releaseRangeId` BIGINT NOT NULL,
+  `className` VARCHAR(150),
+  `classFilePath` VARCHAR(500),
+  `classDataShouldBePrivate` BOOL NOT NULL,
+  `complexClass` BOOL NOT NULL,
+  `functionalDecomposition` BOOL NOT NULL,
+  `godClass` BOOL NOT NULL,
+  `spaghettiCode` BOOL NOT NULL,
+  `hasLongMethods` BOOL NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `techsmell_releaseRangeId_ref`
+    FOREIGN KEY (`releaseRangeId`)
+    REFERENCES `codeface`.`release_range` (`id`))
+ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `codeface`.`tech_and_community_smells`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `codeface`.`tech_and_community_smells`;
+
+CREATE TABLE IF NOT EXISTS `codeface`.`tech_and_community_smells` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `releaseRangeId` BIGINT NOT NULL,
+  `tag` VARCHAR(45) NOT NULL,
+  `authorId` BIGINT NOT NULL,
+  `socioTechnicalSmellId` BIGINT NOT NULL,
+  `smellName` VARCHAR(20) NOT NULL,
+  `file` VARCHAR(500),
+  `classDataShouldBePrivate` BOOL NOT NULL,
+  `complexClass` BOOL NOT NULL,
+  `functionalDecomposition` BOOL NOT NULL,
+  `godClass` BOOL NOT NULL,
+  `spaghettiCode` BOOL NOT NULL,
+  `hasLongMethods` BOOL NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `tech_and_community_smells_releaseRangeId_ref`
+    FOREIGN KEY (`releaseRangeId`)
+    REFERENCES `codeface`.`release_range` (`id`),
+  CONSTRAINT `tech_and_community_smells_authorId_ref`
+    FOREIGN KEY (`authorId`)
+    REFERENCES `codeface`.`person` (`id`),
+  CONSTRAINT `tech_and_community_smells_socioTechnicalSmellId_ref`
+    FOREIGN KEY (`socioTechnicalSmellId`)
+    REFERENCES `codeface`.`sociotechnical_smells` (`id`))
+ENGINE = InnoDB;
+
 
 
 USE `codeface` ;
@@ -1278,6 +1331,53 @@ SELECT
 	p.name AS name,
         prm.rankValue AS rankValue
 FROM pagerank_matrix prm JOIN person p ON p.id=prm.personId;
+
+-- -----------------------------------------------------
+-- View `codeface`.`commited_files_view`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `codeface`.`commited_files_view` ;
+DROP TABLE IF EXISTS `codeface`.`commited_files_view`;
+USE `codeface`;
+CREATE  OR REPLACE VIEW `codeface`.`commited_files_view` AS
+select distinct 
+  author_commit_stats.authorId,
+  author_commit_stats.releaseRangeId,
+  commit_dependency.file
+from       author_commit_stats 
+inner join `commit` on author_commit_stats.releaseRangeId=`commit`.releaseRangeId and author_commit_stats.authorId=`commit`.author
+inner join commit_dependency on `commit`.id=commit_dependency.commitId;
+
+-- -----------------------------------------------------
+-- View `codeface`.`tech_and_community_smells_view`
+-- -----------------------------------------------------
+DROP VIEW IF EXISTS `codeface`.`tech_and_community_smells_view` ;
+DROP TABLE IF EXISTS `codeface`.`tech_and_community_smells_view`;
+USE `codeface`;
+CREATE  OR REPLACE VIEW `codeface`.`tech_and_community_smells_view` AS
+select
+  commited_files_view.releaseRangeId,
+  release_timeline.tag,
+  commited_files_view.authorId,
+  sociotechnical_granular.socioTechnicalSmellId,
+  sociotechnical_smells.name as smellName,
+  commited_files_view.file,
+  techsmell.classDataShouldBePrivate,
+  techsmell.complexClass,
+  techsmell.functionalDecomposition,
+  techsmell.godClass,
+  techsmell.spaghettiCode,
+  techsmell.hasLongMethods
+from       commited_files_view
+inner join sociotechnical_granular on commited_files_view.releaseRangeId = sociotechnical_granular.releaseRangeId and commited_files_view.authorId = sociotechnical_granular.personId
+inner join techsmell on techsmell.releaseRangeId = commited_files_view.releaseRangeId and commited_files_view.file = techsmell.classFilePath
+inner join release_timeline on commited_files_view.releaseRangeId = release_timeline.id
+inner join sociotechnical_smells on sociotechnical_granular.socioTechnicalSmellId = sociotechnical_smells.id
+where techsmell.classDataShouldBePrivate = 1
+      or techsmell.complexClass = 1
+      or techsmell.functionalDecomposition = 1
+      or techsmell.godClass = 1
+      or techsmell.spaghettiCode = 1
+      or techsmell.hasLongMethods = 1;
 
 
 SET SQL_MODE=@OLD_SQL_MODE;
