@@ -82,3 +82,5 @@ yii,http://www.yiiframework.com/,https://github.com/yiisoft/yii.git,
 mongoid,http://mongoid.org/,https://github.com/mongodb/mongoid.git,
 bootstrap,http://getbootstrap.com/,https://github.com/twbs/bootstrap.git,
 AMQ,http://activemq.apache.org/,https://github.com/apache/activemq.git,gmane.comp.java.activemq.devel
+Ant,http://ant.apache.org/,https://github.com/apache/ant.git,gmane.comp.jakarta.ant.devel
+Aries,http://aries.apache.org/,https://github.com/apache/aries.git,gmane.comp.apache.aries.devel
