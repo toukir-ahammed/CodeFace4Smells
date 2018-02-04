@@ -83,4 +83,16 @@ mongoid,http://mongoid.org/,https://github.com/mongodb/mongoid.git,
 bootstrap,http://getbootstrap.com/,https://github.com/twbs/bootstrap.git,
 AMQ,http://activemq.apache.org/,https://github.com/apache/activemq.git,gmane.comp.java.activemq.devel
 Ant,http://ant.apache.org/,https://github.com/apache/ant.git,gmane.comp.jakarta.ant.devel
-Aries,http://aries.apache.org/,https://github.com/apache/aries.git,gmane.comp.apache.aries.devel
+Aries,http://aries.apache.org/,https://github.com/apache/aries.git,
+Camel,http://camel.apache.org/,https://github.com/apache/camel.git,
+Drill,https://drill.apache.org/,https://github.com/apache/drill,gmane.comp.apache.incubator.drill.devel
+Falcon,https://falcon.apache.org/,https://github.com/apache/falcon.git,gmane.comp.apache.falcon.devel
+Felix,http://felix.apache.org/,https://github.com/apache/felix.git,gmane.comp.apache.felix.devel
+JMeter,http://jmeter.apache.org/,https://github.com/apache/jmeter.git,gmane.comp.jakarta.jmeter.devel
+Log4j,https://logging.apache.org/log4j/2.x/,https://github.com/apache/log4j,gmane.comp.jakarta.log4j.devel
+OAK,https://jackrabbit.apache.org/oak/,https://github.com/apache/jackrabbit-oak.git,gmane.comp.apache.jackrabbit.oak.devel
+OpenEJB,http://openejb.apache.org/,https://github.com/apache/openejb,gmane.comp.java.openejb.devel
+POI,https://poi.apache.org/,https://github.com/apache/poi.git,gmane.comp.jakarta.poi.devel
+Ranger,https://ranger.apache.org/https://github.com/apache/ranger.git,gmane.comp.apache.incubator.ranger.devel
+Shindig,https://shindig.apache.org/,https://github.com/apache/shindig.git,gmane.comp.web.shindig.devel
+Xercer,http://xerces.apache.org/xerces2-j/,https://github.com/apache/xerces2-j.git,gmane.text.xml.xerces-j.devel
