@@ -93,6 +93,6 @@ Log4j,https://logging.apache.org/log4j/2.x/,https://github.com/apache/log4j,gman
 OAK,https://jackrabbit.apache.org/oak/,https://github.com/apache/jackrabbit-oak.git,gmane.comp.apache.jackrabbit.oak.devel
 OpenEJB,http://openejb.apache.org/,https://github.com/apache/openejb,gmane.comp.java.openejb.devel
 POI,https://poi.apache.org/,https://github.com/apache/poi.git,gmane.comp.jakarta.poi.devel
-Ranger,https://ranger.apache.org/https://github.com/apache/ranger.git,gmane.comp.apache.incubator.ranger.devel
+Ranger,https://ranger.apache.org/,https://github.com/apache/ranger.git,gmane.comp.apache.incubator.ranger.devel
 Shindig,https://shindig.apache.org/,https://github.com/apache/shindig.git,gmane.comp.web.shindig.devel
 Xercer,http://xerces.apache.org/xerces2-j/,https://github.com/apache/xerces2-j.git,gmane.text.xml.xerces-j.devel
