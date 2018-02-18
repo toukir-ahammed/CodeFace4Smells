@@ -35,7 +35,7 @@ libuv,http://libuv.org/,https://github.com/libuv/libuv.git,gmane.comp.lang.javas
 libva,https://01.org/linuxmedia,git://anongit.freedesktop.org/git/libva,gmane.comp.freedesktop.libva
 LLVM,http://llvm.org/,http://llvm.org/git/llvm,gmane.comp.compilers.llvm.devel
 Lucene,https://lucene.apache.org/core/,git://git.apache.org/lucene-solr.git,gmane.comp.jakarta.lucene.devel
-Mahout,http://mahout.apache.org/,git://git.apache.org/mahout.git,gmane.comp.apache.mahout.devel
+Mahout,http://mahout.apache.org/,https://github.com/apache/mahout.git,gmane.comp.apache.mahout.devel
 Mallet,http://mallet.cs.umass.edu/,https://github.com/mimno/Mallet.git,gmane.comp.ai.mallet.devel
 matplotlib,http://matplotlib.org/,https://github.com/matplotlib/matplotlib.git,gmane.comp.python.matplotlib.devel
 Mesa,https://www.mesa3d.org/,git://anongit.freedesktop.org/mesa/mesa,gmane.comp.video.mesa3d.devel
@@ -44,8 +44,8 @@ NetworkManager,,git://anongit.freedesktop.org/NetworkManager/NetworkManager.git,
 nginx,http://nginx.org/,https://github.com/nginx/nginx.git,gmane.comp.web.nginx.devel
 NodeJS,https://nodejs.org/,https://github.com/nodejs/node.git,gmane.comp.lang.javascript.nodejs
 Okular,https://okular.kde.org/,git://anongit.kde.org/okular,gmane.comp.kde.devel.okular
-OpenNLP,https://github.com/apache/opennlp,git://git.apache.org/opennlp.git,gmane.comp.apache.opennlp.devel
-OpenSSL,https://www.openssl.org/,git://git.openssl.org/openssl.git,gmane.comp.encryption.openssl.devel
+OpenNLP,http://opennlp.apache.org/,https://github.com/apache/opennlp.git,gmane.comp.apache.opennlp.devel
+OpenSSL,https://www.openssl.org/,https://github.com/openssl/openssl.git,gmane.comp.encryption.openssl.devel
 Pig,https://pig.apache.org/,git://git.apache.org/pig.git,gmane.comp.java.hadoop.pig.devel
 Python,https://www.python.org/,https://github.com/python/cpython.git,gmane.comp.python.devel
 QEMU,http://www.qemu.org/,git://git.qemu.org/qemu.git,gmane.comp.emulators.qemu

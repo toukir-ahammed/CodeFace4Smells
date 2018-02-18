@@ -54,7 +54,7 @@ def doTechSmellAnalysis(conf, resdir, repo, tsadir):
         tsa_cmd.append(tsadir + "/RunCodeSmellDetection.jar")
         tsa_cmd.append(repo)
         tsa_cmd.append(csv_file_name)
-        # stdout = execute_command(tsa_cmd, ignore_errors=True, direct_io=False, cwd=repo)
+        execute_command(tsa_cmd, ignore_errors=True, direct_io=False, cwd=repo)
 
         i = i + 1
         pbar.update(i)
