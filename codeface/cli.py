@@ -32,7 +32,7 @@ from codeface.configuration import Configuration
 from codeface.util import execute_command
 from codeface.project import (project_analyse, mailinglist_analyse, sociotechnical_analyse,
                               techsmell_analyse)
-import codeface.smart_runner as smart
+import codeface.smells_runner as smells
 
 def get_parser():
     parser = argparse.ArgumentParser(prog='codeface',
@@ -116,11 +116,11 @@ def get_parser():
     dyn_parser.add_argument('-l', '--list', action="store_true", help="list available graphs")
     dyn_parser.add_argument('-p', '--port', default="8100", help="Pass this to R as port to listen on")
 
-    smart_parser = sub_parser.add_parser('smart',
+    smells_parser = sub_parser.add_parser('smells',
                                          description="Start a complete analisys using default "
                                          "values of known projects. For additional help please see "
                                          "http://www.google.com/")
-    smart_parser.set_defaults(func=cmd_smart)
+    smells_parser.set_defaults(func=cmd_smells)
 
     tsa_parser = sub_parser.add_parser('tsa', description="Start tech smell analysis")
     tsa_parser.set_defaults(func=cmd_tsa)
@@ -132,30 +132,30 @@ def get_parser():
 
     return parser
 
-def cmd_smart(args):
+def cmd_smells(args):
 
     (cf_conf, prj_args, ml_args, st_args,
-     tsa_args) = smart.prepare_reqs(os.path.basename(os.getcwd()), os.getcwd(), log)
+     tsa_args) = smells.prepare_reqs(os.path.basename(os.getcwd()), os.getcwd(), log)
 
     execute_command(['killall', 'node'], True)
     id_service = subprocess.Popen(["node", cf_conf.codeface_dir + '/../id_service/id_service.js',
                                    cf_conf.codeface_conf_file], stdout=subprocess.PIPE)
 
-    if smart.get_status(cf_conf.status_file, smart.PROJECT_ANALIZED) is False:
+    if smells.get_status(cf_conf.status_file, smells.PROJECT_ANALIZED) is False:
         cmd_run(prj_args)
-        smart.set_status_done(cf_conf.status_file, smart.PROJECT_ANALIZED)
+        smells.set_status_done(cf_conf.status_file, smells.PROJECT_ANALIZED)
 
-    if smart.get_status(cf_conf.status_file, smart.ML_ANALIZED) is False:
+    if smells.get_status(cf_conf.status_file, smells.ML_ANALIZED) is False:
         cmd_ml(ml_args)
-        smart.set_status_done(cf_conf.status_file, smart.ML_ANALIZED)
+        smells.set_status_done(cf_conf.status_file, smells.ML_ANALIZED)
 
-    if smart.get_status(cf_conf.status_file, smart.SOCIOTECH_ANALIZED) is False:
+    if smells.get_status(cf_conf.status_file, smells.SOCIOTECH_ANALIZED) is False:
         cmd_st(st_args)
-        smart.set_status_done(cf_conf.status_file, smart.SOCIOTECH_ANALIZED)
+        smells.set_status_done(cf_conf.status_file, smells.SOCIOTECH_ANALIZED)
 
-    if smart.get_status(cf_conf.status_file, smart.TECHSMELL_ANALIZED) is False:
+    if smells.get_status(cf_conf.status_file, smells.TECHSMELL_ANALIZED) is False:
         cmd_tsa(tsa_args)
-        smart.set_status_done(cf_conf.status_file, smart.TECHSMELL_ANALIZED)
+        smells.set_status_done(cf_conf.status_file, smells.TECHSMELL_ANALIZED)
 
     id_service.terminate()
 
