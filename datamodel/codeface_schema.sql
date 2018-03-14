@@ -1120,7 +1120,10 @@ DROP TABLE IF EXISTS `codeface`.`tech_and_community_smells`;
 
 CREATE TABLE IF NOT EXISTS `codeface`.`tech_and_community_smells` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `projectId` BIGINT NOT NULL,
+  `projectName` VARCHAR(255) NOT NULL,
   `releaseRangeId` BIGINT NOT NULL,
+  `releaseEra` INT NOT NULL,
   `tag` VARCHAR(45) NOT NULL,
   `authorId` BIGINT NOT NULL,
   `socioTechnicalSmellId` BIGINT NOT NULL,
@@ -1133,6 +1136,9 @@ CREATE TABLE IF NOT EXISTS `codeface`.`tech_and_community_smells` (
   `spaghettiCode` BOOL NOT NULL,
   `hasLongMethods` BOOL NOT NULL,
   PRIMARY KEY (`id`),
+  CONSTRAINT `tech_and_community_smells_projectId_ref`
+    FOREIGN KEY (`projectId`)
+    REFERENCES `codeface`.`project` (`id`),
   CONSTRAINT `tech_and_community_smells_releaseRangeId_ref`
     FOREIGN KEY (`releaseRangeId`)
     REFERENCES `codeface`.`release_range` (`id`),
