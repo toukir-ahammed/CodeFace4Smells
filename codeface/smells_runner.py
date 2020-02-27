@@ -207,7 +207,7 @@ def _get_nntp_infos(mail_list, year, month, day):
         return time.mktime(datetime_object)
 
 
-    news_server = nntplib.NNTP('news.gmane.org')
+    news_server = nntplib.NNTP('news.gmane.io')
     _, _, first, last, _ = news_server.group(mail_list)
     _, subs = news_server.xhdr('date', first + '-' + last)
 

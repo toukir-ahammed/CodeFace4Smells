@@ -32,7 +32,7 @@ download.mbox <- function(ml, num, outfile) {
   ## of time.
   ## TODO: Use nntp-pull --verbose, count the number of emitted
   ## lines, and provide a status progress bar.
-  cmd <- str_c("nntp-pull --server=news.gmane.org --verbose --reget --limit=",
+  cmd <- str_c("nntp-pull --server=news.gmane.io --verbose --reget --limit=",
                num, " '", ml, ">", outfile, "' 2>&1")
   cat(str_c("Downloading ", num, " messages from ", ml, "\n"))
   cat(cmd, "\n")

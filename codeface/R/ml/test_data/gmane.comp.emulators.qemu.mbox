@@ -1,5 +1,5 @@
 From MAILER-DAEMON Mon Jul 20 15:54:29 2015
-Path: news.gmane.org!not-for-mail
+Path: news.gmane.io!not-for-mail
 From: bossy bill <bossybill@redhat.com>
 Newsgroups: gmane.comp.emulators.qemu
 Subject: Re: QEMU segfault: Booting an overlay with
@@ -75,7 +75,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
 Original-Sender: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
-Xref: news.gmane.org gmane.comp.emulators.qemu:316904
+Xref: news.gmane.io gmane.comp.emulators.qemu:316904
 Archived-At: <http://permalink.gmane.org/gmane.comp.emulators.qemu/316904>
 
 On Thu, Jan 29, 2015 at 06:22:22PM +0100, Kashyap Chamarthy wrote:
@@ -172,7 +172,7 @@ if ! echo "$@" | grep -sqE -- '-help|-version|-device \?' ; then
 
 
 From MAILER-DAEMON Mon Jul 20 15:54:29 2015
-Path: news.gmane.org!not-for-mail
+Path: news.gmane.io!not-for-mail
 From: sneaky sam <sneakysam@redhat.com>
 Newsgroups: gmane.comp.emulators.qemu
 Subject: Re: [PATCH 05/21] block: Remove per-BDS close notifiers
@@ -247,7 +247,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
 Original-Sender: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
-Xref: news.gmane.org gmane.comp.emulators.qemu:316905
+Xref: news.gmane.io gmane.comp.emulators.qemu:316905
 Archived-At: <http://permalink.gmane.org/gmane.comp.emulators.qemu/316905>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
@@ -297,7 +297,7 @@ tqx8jXsXuQh3o1m2cGFxyFRcCz5R+H1jPaOIlZfZ9N4KOlNNGccBdHL30ndFVshu
 --avdpGP8cvVQtFft4fDmI1Tg41LDrtw732--
 
 From MAILER-DAEMON Mon Jul 23 15:54:29 2015
-Path: news.gmane.org!not-for-mail
+Path: news.gmane.io!not-for-mail
 From: chatty kathy <chatty@redhat.com>
 Newsgroups: gmane.comp.emulators.qemu
 Subject: Re: QEMU segfault: Booting an overlay with
@@ -373,11 +373,11 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
 Original-Sender: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
-Xref: news.gmane.org gmane.comp.emulators.qemu:316904
+Xref: news.gmane.io gmane.comp.emulators.qemu:316904
 Archived-At: <http://permalink.gmane.org/gmane.comp.emulators.qemu/316904>
 
 From MAILER-DAEMON Mon Jul 26 15:54:29 2015
-Path: news.gmane.org!not-for-mail
+Path: news.gmane.io!not-for-mail
 From: nasty nate <nastynate@redhat.com>
 Newsgroups: gmane.comp.emulators.qemu
 Subject: Re: [PATCH 05/21] block: Remove per-BDS close notifiers
@@ -452,7 +452,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
 Original-Sender: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
-Xref: news.gmane.org gmane.comp.emulators.qemu:316905
+Xref: news.gmane.io gmane.comp.emulators.qemu:316905
 Archived-At: <http://permalink.gmane.org/gmane.comp.emulators.qemu/316905>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
